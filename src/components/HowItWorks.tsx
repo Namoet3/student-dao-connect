@@ -1,26 +1,31 @@
-import { FileText, UserCheck, CheckCircle, Coins } from "lucide-react";
+import { Building, Lock, GraduationCap, Shield, Coins } from "lucide-react";
 
 const HowItWorks = () => {
   const steps = [
     {
-      icon: FileText,
-      title: "Browse & Apply",
-      description: "Discover projects that match your skills and submit proposals with your portfolio."
+      icon: Building,
+      title: "Company Posts Project",
+      description: "Companies post project requirements, budget, and timeline to the decentralized platform."
     },
     {
-      icon: UserCheck,
-      title: "Get Selected",
-      description: "Companies review applications and select the best candidates through our matching algorithm."
+      icon: Lock,
+      title: "Funds Locked",
+      description: "Smart contract automatically locks project funds in escrow until completion criteria are met."
     },
     {
-      icon: CheckCircle,
-      title: "Complete Work",
-      description: "Deliver high-quality work within deadlines using our collaborative workspace tools."
+      icon: GraduationCap,
+      title: "Student Delivers",
+      description: "Selected student completes the work and submits deliverables through the platform."
+    },
+    {
+      icon: Shield,
+      title: "DAO Verifies",
+      description: "Decentralized community validates work quality and completion against project requirements."
     },
     {
       icon: Coins,
-      title: "Earn Rewards",
-      description: "Receive instant payments and reputation tokens upon successful project completion."
+      title: "Payment Released",
+      description: "Smart contract automatically releases payment and reputation tokens upon verification."
     }
   ];
 
