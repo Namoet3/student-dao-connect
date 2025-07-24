@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface WalletState {
   account: string | null;
@@ -14,6 +15,52 @@ export const useWallet = () => {
     isConnecting: false,
     error: null,
   });
+
+  const saveWalletConnection = async (walletAddress: string) => {
+    try {
+      // First, try to get existing wallet connection
+      const { data: existingConnection, error: fetchError } = await supabase
+        .from('wallet_connections')
+        .select('*')
+        .eq('wallet_address', walletAddress.toLowerCase())
+        .single();
+
+      if (fetchError && fetchError.code !== 'PGRST116') {
+        console.error('Error fetching wallet connection:', fetchError);
+        return;
+      }
+
+      if (existingConnection) {
+        // Update existing connection
+        const { error: updateError } = await supabase
+          .from('wallet_connections')
+          .update({
+            last_connected_at: new Date().toISOString(),
+            connection_count: existingConnection.connection_count + 1,
+            user_agent: navigator.userAgent,
+          })
+          .eq('wallet_address', walletAddress.toLowerCase());
+
+        if (updateError) {
+          console.error('Error updating wallet connection:', updateError);
+        }
+      } else {
+        // Insert new connection
+        const { error: insertError } = await supabase
+          .from('wallet_connections')
+          .insert({
+            wallet_address: walletAddress.toLowerCase(),
+            user_agent: navigator.userAgent,
+          });
+
+        if (insertError) {
+          console.error('Error inserting wallet connection:', insertError);
+        }
+      }
+    } catch (error) {
+      console.error('Error saving wallet connection:', error);
+    }
+  };
 
   const connectWallet = async () => {
     if (!window.ethereum) {
@@ -38,6 +85,9 @@ export const useWallet = () => {
           isConnecting: false,
           error: null,
         });
+        
+        // Save wallet connection to database
+        await saveWalletConnection(accounts[0]);
       }
     } catch (error: any) {
       setWalletState(prev => ({
@@ -71,6 +121,9 @@ export const useWallet = () => {
               account: accounts[0],
               isConnected: true,
             }));
+            
+            // Save wallet connection to database on reconnection
+            await saveWalletConnection(accounts[0]);
           }
         } catch (error) {
           console.error('Failed to check wallet connection:', error);
@@ -88,6 +141,9 @@ export const useWallet = () => {
             account: accounts[0],
             isConnected: true,
           }));
+          
+          // Save wallet connection to database
+          await saveWalletConnection(accounts[0]);
         } else {
           disconnectWallet();
         }

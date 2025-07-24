@@ -14,7 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      wallet_connections: {
+        Row: {
+          id: string
+          wallet_address: string
+          connected_at: string
+          last_connected_at: string
+          connection_count: number
+          user_agent: string | null
+          ip_address: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          wallet_address: string
+          connected_at?: string
+          last_connected_at?: string
+          connection_count?: number
+          user_agent?: string | null
+          ip_address?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          wallet_address?: string
+          connected_at?: string
+          last_connected_at?: string
+          connection_count?: number
+          user_agent?: string | null
+          ip_address?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
