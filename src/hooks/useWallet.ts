@@ -134,7 +134,7 @@ export const useWallet = () => {
     checkConnection();
 
     if (window.ethereum) {
-      const handleAccountsChanged = (accounts: string[]) => {
+      const handleAccountsChanged = async (accounts: string[]) => {
         if (accounts.length > 0) {
           setWalletState(prev => ({
             ...prev,
