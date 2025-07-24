@@ -1,8 +1,38 @@
 import { Button } from "@/components/ui/button";
-import { Wallet, Menu, Search, Bell } from "lucide-react";
+import { Wallet, Menu, Search, Bell, ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useWallet } from "@/hooks/useWallet";
+import { useToast } from "@/hooks/use-toast";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Header = () => {
+  const { isConnected, isConnecting, account, connectWallet, disconnectWallet, formatAddress, error } = useWallet();
+  const { toast } = useToast();
+
+  const handleWalletAction = async () => {
+    if (isConnected) {
+      disconnectWallet();
+      toast({
+        title: "Wallet Disconnected",
+        description: "Your wallet has been disconnected successfully.",
+      });
+    } else {
+      await connectWallet();
+      if (error) {
+        toast({
+          title: "Connection Failed",
+          description: error,
+          variant: "destructive",
+        });
+      }
+    }
+  };
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
@@ -44,10 +74,32 @@ const Header = () => {
             <Bell className="w-4 h-4" />
           </Button>
           
-          <Button variant="hero" className="gap-2">
-            <Wallet className="w-4 h-4" />
-            Connect Wallet
-          </Button>
+          {isConnected ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="hero" className="gap-2">
+                  <Wallet className="w-4 h-4" />
+                  {formatAddress(account!)}
+                  <ChevronDown className="w-4 h-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={handleWalletAction}>
+                  Disconnect Wallet
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Button 
+              variant="hero" 
+              className="gap-2" 
+              onClick={handleWalletAction}
+              disabled={isConnecting}
+            >
+              <Wallet className="w-4 h-4" />
+              {isConnecting ? "Connecting..." : "Connect Wallet"}
+            </Button>
+          )}
           
           <Button variant="ghost" size="icon" className="md:hidden">
             <Menu className="w-4 h-4" />
