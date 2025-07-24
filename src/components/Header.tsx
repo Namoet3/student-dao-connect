@@ -1,30 +1,31 @@
 import { Button } from "@/components/ui/button";
 import { Wallet, Menu, Search, Bell } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Header = () => {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center gap-6">
-          <div className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2">
             <div className="w-8 h-8 bg-gradient-primary rounded-md flex items-center justify-center">
               <span className="text-white font-bold text-sm">UD</span>
             </div>
             <span className="font-bold text-xl text-foreground">UniversityDAO</span>
-          </div>
+          </Link>
           
           <nav className="hidden md:flex items-center gap-6">
-            <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
-              Browse Projects
-            </a>
-            <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
-              Post Project
-            </a>
-            <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+            <Link to="/for-students" className="text-muted-foreground hover:text-primary transition-colors">
+              For Students
+            </Link>
+            <Link to="/for-employers" className="text-muted-foreground hover:text-primary transition-colors">
+              For Employers
+            </Link>
+            <Link to="/roadmap" className="text-muted-foreground hover:text-primary transition-colors">
+              Roadmap
+            </Link>
+            <a href="#how-it-works" className="text-muted-foreground hover:text-primary transition-colors">
               How It Works
-            </a>
-            <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
-              About
             </a>
           </nav>
         </div>
