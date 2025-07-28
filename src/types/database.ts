@@ -7,6 +7,7 @@ export interface Project {
   budget_max: number | null;
   status: 'open' | 'active' | 'completed';
   created_at: string;
+  people_count: number;
 }
 
 export interface Application {

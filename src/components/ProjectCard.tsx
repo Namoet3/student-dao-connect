@@ -65,14 +65,19 @@ export const ProjectCard = ({ project, onApply }: ProjectCardProps) => {
           {project.description}
         </p>
         
-        <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
-          <div className="flex items-center gap-1">
-            <DollarSign className="h-4 w-4" />
-            <span className="font-semibold text-primary">{formatBudget(project.budget_min, project.budget_max)}</span>
+        <div className="space-y-2 mb-4">
+          <div className="flex items-center justify-between text-sm text-muted-foreground">
+            <div className="flex items-center gap-1">
+              <DollarSign className="h-4 w-4" />
+              <span className="font-semibold text-primary">{formatBudget(project.budget_min, project.budget_max)}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Clock className="h-4 w-4" />
+              <span>{formatDistanceToNow(new Date(project.created_at), { addSuffix: true })}</span>
+            </div>
           </div>
-          <div className="flex items-center gap-1">
-            <Clock className="h-4 w-4" />
-            <span>{formatDistanceToNow(new Date(project.created_at), { addSuffix: true })}</span>
+          <div className="text-sm text-muted-foreground">
+            People needed: {project.people_count}
           </div>
         </div>
 

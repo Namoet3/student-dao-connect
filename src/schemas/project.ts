@@ -17,6 +17,10 @@ export const projectSchema = z.object({
     .number()
     .min(0, 'Maximum budget must be positive')
     .optional(),
+  people_count: z
+    .number()
+    .min(1, 'Number of people must be at least 1')
+    .default(1),
 }).refine((data) => {
   if (data.budget_min && data.budget_max) {
     return data.budget_min <= data.budget_max;

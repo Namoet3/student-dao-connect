@@ -300,6 +300,18 @@ export const ProjectDetail = () => {
                 <CardContent className="space-y-4">
                   <div>
                     <div className="flex items-center gap-2 text-sm font-medium mb-2">
+                      <Users className="h-4 w-4" />
+                      People Needed
+                    </div>
+                    <p className="text-lg font-semibold text-primary">
+                      {project.people_count}
+                    </p>
+                  </div>
+                  
+                  <Separator />
+                  
+                  <div>
+                    <div className="flex items-center gap-2 text-sm font-medium mb-2">
                       <DollarSign className="h-4 w-4" />
                       Budget Range
                     </div>

@@ -7,6 +7,7 @@ import { ProjectCard } from '@/components/ProjectCard';
 import { ProjectFilters } from '@/components/ProjectFilters';
 import { EmptyState } from '@/components/EmptyState';
 import { MyProjectsTab } from '@/components/MyProjectsTab';
+import { AcceptedProjectsTab } from '@/components/AcceptedProjectsTab';
 import { useProjects, ProjectFilters as FilterType } from '@/hooks/useProjects';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
@@ -124,9 +125,10 @@ export const Projects = () => {
       </div>
 
       <Tabs defaultValue="all" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="all">All Projects</TabsTrigger>
           <TabsTrigger value="my-projects">My Projects</TabsTrigger>
+          <TabsTrigger value="accepted">Accepted Projects</TabsTrigger>
         </TabsList>
 
         <TabsContent value="all" className="space-y-6">
@@ -190,6 +192,10 @@ export const Projects = () => {
 
         <TabsContent value="my-projects">
           <MyProjectsTab />
+        </TabsContent>
+
+        <TabsContent value="accepted">
+          <AcceptedProjectsTab />
         </TabsContent>
       </Tabs>
     </div>

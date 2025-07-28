@@ -25,6 +25,7 @@ export const PostProject = () => {
       description: '',
       budget_min: undefined,
       budget_max: undefined,
+      people_count: 1,
     },
   });
 
@@ -56,6 +57,7 @@ export const PostProject = () => {
         description: data.description,
         budget_min: data.budget_min || null,
         budget_max: data.budget_max || null,
+        people_count: data.people_count,
         status: 'open',
       });
 
@@ -119,6 +121,29 @@ export const PostProject = () => {
                             placeholder="Describe your project in detail. Include requirements, goals, and what you're looking for in a collaborator..."
                             className="min-h-[200px]"
                             {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="people_count"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Number of People Needed</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            min="1"
+                            placeholder="1"
+                            {...field}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              field.onChange(value ? parseInt(value) : 1);
+                            }}
                           />
                         </FormControl>
                         <FormMessage />
