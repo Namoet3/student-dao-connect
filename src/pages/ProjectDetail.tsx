@@ -37,7 +37,7 @@ export const ProjectDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { data: project, isLoading, error } = useProject(id!);
+  const { data: project, isLoading, error, refetch } = useProject(id!);
   const [coverLetter, setCoverLetter] = useState('');
   const [isApplying, setIsApplying] = useState(false);
 
@@ -281,10 +281,19 @@ export const ProjectDetail = () => {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <ApplicationManagement 
-                      applications={project.applications || []} 
-                      isOwner={isOwner} 
-                    />
+                    {!user ? (
+                      <div className="text-center py-8">
+                        <p className="text-muted-foreground">Connect your wallet to view applications</p>
+                        <Button onClick={() => refetch()} variant="outline" className="mt-4">
+                          Refresh
+                        </Button>
+                      </div>
+                    ) : (
+                      <ApplicationManagement 
+                        applications={project.applications || []} 
+                        isOwner={isOwner} 
+                      />
+                    )}
                   </CardContent>
                 </Card>
               )}
@@ -394,6 +403,38 @@ export const ProjectDetail = () => {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Approved Team Members */}
+              {project.applications && project.applications.some(app => app.status === 'accepted') && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Users className="h-5 w-5" />
+                      Approved Team Members
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {project.applications
+                      .filter(app => app.status === 'accepted')
+                      .map((application) => (
+                        <div key={application.id} className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                          <div className="w-10 h-10 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center">
+                            <User className="h-5 w-5 text-white" />
+                          </div>
+                          <div className="flex-1">
+                            <p className="font-medium text-sm">{formatAddress(application.applicant_id)}</p>
+                            <p className="text-xs text-muted-foreground">
+                              Accepted {formatDistanceToNow(new Date(application.created_at), { addSuffix: true })}
+                            </p>
+                          </div>
+                          <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">
+                            Approved
+                          </Badge>
+                        </div>
+                      ))}
+                  </CardContent>
+                </Card>
+              )}
 
               {/* Back Button */}
               <Button
