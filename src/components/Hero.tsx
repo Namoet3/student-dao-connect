@@ -32,28 +32,28 @@ const Hero = () => {
               <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-2">
                 <Users className="w-6 h-6 text-primary" />
               </div>
-              <div className="text-2xl font-bold text-foreground">10K+</div>
+              <div className="text-2xl font-bold text-foreground">NaN</div>
               <div className="text-sm text-muted-foreground">Students</div>
             </div>
             <div className="text-center">
               <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-2">
                 <Briefcase className="w-6 h-6 text-primary" />
               </div>
-              <div className="text-2xl font-bold text-foreground">5K+</div>
+              <div className="text-2xl font-bold text-foreground">NaN</div>
               <div className="text-sm text-muted-foreground">Projects</div>
             </div>
             <div className="text-center">
               <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-2">
                 <Award className="w-6 h-6 text-primary" />
               </div>
-              <div className="text-2xl font-bold text-foreground">98%</div>
+              <div className="text-2xl font-bold text-foreground">NaN</div>
               <div className="text-sm text-muted-foreground">Success Rate</div>
             </div>
             <div className="text-center">
               <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-2">
                 <TrendingUp className="w-6 h-6 text-primary" />
               </div>
-              <div className="text-2xl font-bold text-foreground">$2M+</div>
+              <div className="text-2xl font-bold text-foreground">NaN</div>
               <div className="text-sm text-muted-foreground">Paid Out</div>
             </div>
           </div>
