@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Wallet, Menu, Search, Bell, ChevronDown, User } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useWallet } from "@/hooks/useWallet";
-import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,27 +13,16 @@ import ProfilePanel from "./ProfilePanel";
 import { useState } from "react";
 
 const Header = () => {
-  const { isConnected, isConnecting, account, connectWallet, disconnectWallet, formatAddress, error } = useWallet();
-  const { toast } = useToast();
+  const { formatAddress } = useWallet();
+  const { user, isLoading, login, logout } = useAuth();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   const handleWalletAction = async () => {
-    if (isConnected) {
-      disconnectWallet();
+    if (user) {
+      logout();
       setIsProfileOpen(false);
-      toast({
-        title: "Wallet Disconnected",
-        description: "Your wallet has been disconnected successfully.",
-      });
     } else {
-      await connectWallet();
-      if (error) {
-        toast({
-          title: "Connection Failed",
-          description: error,
-          variant: "destructive",
-        });
-      }
+      await login();
     }
   };
 
@@ -83,12 +72,12 @@ const Header = () => {
               <Bell className="w-4 h-4" />
             </Button>
             
-            {isConnected ? (
+            {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="hero" className="gap-2">
                     <Wallet className="w-4 h-4" />
-                    {formatAddress(account!)}
+                    {formatAddress(user.address)}
                     <ChevronDown className="w-4 h-4" />
                   </Button>
                 </DropdownMenuTrigger>
@@ -98,7 +87,7 @@ const Header = () => {
                     My Profile
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleWalletAction}>
-                    Disconnect Wallet
+                    Sign Out
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -107,10 +96,10 @@ const Header = () => {
                 variant="hero" 
                 className="gap-2" 
                 onClick={handleWalletAction}
-                disabled={isConnecting}
+                disabled={isLoading}
               >
                 <Wallet className="w-4 h-4" />
-                {isConnecting ? "Connecting..." : "Connect Wallet"}
+                {isLoading ? "Connecting..." : "Connect Wallet"}
               </Button>
             )}
             
@@ -121,12 +110,14 @@ const Header = () => {
         </div>
       </header>
 
-      <ProfilePanel
-        isOpen={isProfileOpen}
-        onClose={() => setIsProfileOpen(false)}
-        walletAddress={account || ""}
-        onDisconnect={handleWalletAction}
-      />
+      {user && (
+        <ProfilePanel
+          isOpen={isProfileOpen}
+          onClose={() => setIsProfileOpen(false)}
+          walletAddress={user.address}
+          onDisconnect={handleWalletAction}
+        />
+      )}
     </>
   );
 };
