@@ -4,24 +4,28 @@ import { Project } from '@/types/database';
 
 export const useAcceptedProjects = (applicantAddress: string | null) => {
   return useQuery({
-    queryKey: ['accepted-projects', applicantAddress],
+    queryKey: ['projects', 'accepted', applicantAddress],
     queryFn: async () => {
       if (!applicantAddress) return [];
       
+      // Optimized single query with inner join
       const { data, error } = await supabase
-        .from('applications')
+        .from('projects')
         .select(`
-          project_id,
-          projects!inner (*)
+          *,
+          applications!inner (
+            status
+          )
         `)
-        .eq('applicant_id', applicantAddress)
-        .eq('status', 'accepted');
+        .eq('applications.applicant_id', applicantAddress)
+        .eq('applications.status', 'accepted')
+        .order('created_at', { ascending: false });
 
       if (error) {
         throw new Error(error.message);
       }
 
-      return data.map((item: any) => item.projects).filter(Boolean) as Project[];
+      return data as Project[];
     },
     enabled: !!applicantAddress,
   });

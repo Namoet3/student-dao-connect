@@ -1,10 +1,13 @@
 import { useNavigate } from "react-router-dom";
-import { X, Edit3, Trophy, Coins, Shield, Plus, ArrowDownToLine, Vote, LogOut } from "lucide-react";
+import { X, Edit3, Trophy, Coins, Shield, Plus, ArrowDownToLine, Vote, LogOut, FileText, Users, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useProjectCounts } from '@/hooks/useProjectCounts';
+import { useActivities } from '@/hooks/useActivities';
 
 interface ProfilePanelProps {
   isOpen: boolean;
@@ -15,18 +18,37 @@ interface ProfilePanelProps {
 
 const ProfilePanel = ({ isOpen, onClose, walletAddress, onDisconnect }: ProfilePanelProps) => {
   const navigate = useNavigate();
+  const { data: projectCounts, isLoading: countsLoading } = useProjectCounts();
+  const { data: activities, isLoading: activitiesLoading } = useActivities(10);
   
   const formatAddress = (address: string) => {
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
   };
 
-  const recentActivities = [
-    { action: "Applied to Project: DeFi Analytics Dashboard", date: "2 hours ago" },
-    { action: "Funded Project: Smart Contract Audit", date: "1 day ago" },
-    { action: "Left review for Student Alex Chen", date: "3 days ago" },
-    { action: "Completed: NFT Marketplace Frontend", date: "1 week ago" },
-    { action: "Posted Project: Blockchain Education Platform", date: "2 weeks ago" },
-  ];
+  const formatTimeAgo = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
+    
+    if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
+    if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h ago`;
+    return `${Math.floor(diffInMinutes / 1440)}d ago`;
+  };
+
+  const getActivityIcon = (kind: string) => {
+    switch (kind) {
+      case 'posted_project':
+        return <FileText className="w-3 h-3 text-blue-500" />;
+      case 'pending_application':
+        return <Users className="w-3 h-3 text-yellow-500" />;
+      case 'accepted_application':
+        return <CheckCircle className="w-3 h-3 text-green-500" />;
+      case 'rejected_application':
+        return <X className="w-3 h-3 text-red-500" />;
+      default:
+        return <div className="w-2 h-2 bg-primary rounded-full" />;
+    }
+  };
 
   return (
     <>
@@ -134,23 +156,44 @@ const ProfilePanel = ({ isOpen, onClose, walletAddress, onDisconnect }: ProfileP
                 <CardTitle className="text-lg">My Projects</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-3 gap-4 text-center">
-                  <div>
-                    <div className="text-2xl font-bold text-primary">5</div>
-                    <p className="text-sm text-muted-foreground">Posted</p>
-                    <Button variant="link" className="p-0 h-auto text-xs">
-                      View All
-                    </Button>
+                {countsLoading ? (
+                  <div className="grid grid-cols-3 gap-4 text-center">
+                    <div>
+                      <Skeleton className="h-8 w-12 mx-auto mb-2" />
+                      <p className="text-sm text-muted-foreground">Posted</p>
+                    </div>
+                    <div>
+                      <Skeleton className="h-8 w-12 mx-auto mb-2" />
+                      <p className="text-sm text-muted-foreground">Active</p>
+                    </div>
+                    <div>
+                      <Skeleton className="h-8 w-12 mx-auto mb-2" />
+                      <p className="text-sm text-muted-foreground">Completed</p>
+                    </div>
                   </div>
-                  <div>
-                    <div className="text-2xl font-bold text-orange-500">0</div>
-                    <p className="text-sm text-muted-foreground">Active</p>
+                ) : (
+                  <div className="grid grid-cols-3 gap-4 text-center">
+                    <div>
+                      <div className="text-2xl font-bold text-primary">{projectCounts?.posted || 0}</div>
+                      <p className="text-sm text-muted-foreground">Posted</p>
+                      <Button 
+                        variant="link" 
+                        className="p-0 h-auto text-xs"
+                        onClick={() => navigate('/projects?tab=my-projects')}
+                      >
+                        View All
+                      </Button>
+                    </div>
+                    <div>
+                      <div className="text-2xl font-bold text-orange-500">{projectCounts?.active || 0}</div>
+                      <p className="text-sm text-muted-foreground">Active</p>
+                    </div>
+                    <div>
+                      <div className="text-2xl font-bold text-green-500">{projectCounts?.completed || 0}</div>
+                      <p className="text-sm text-muted-foreground">Completed</p>
+                    </div>
                   </div>
-                  <div>
-                    <div className="text-2xl font-bold text-green-500">0</div>
-                    <p className="text-sm text-muted-foreground">Completed</p>
-                  </div>
-                </div>
+                )}
               </CardContent>
             </Card>
 
@@ -161,19 +204,35 @@ const ProfilePanel = ({ isOpen, onClose, walletAddress, onDisconnect }: ProfileP
               </CardHeader>
               <CardContent>
                 <div className="space-y-3 max-h-48 overflow-y-auto">
-                  {recentActivities.map((activity, index) => (
-                    <div key={index} className="flex items-start gap-3 p-2 rounded-lg hover:bg-muted/50">
-                      <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium leading-relaxed">
-                          {activity.action}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {activity.date}
-                        </p>
+                  {activitiesLoading ? (
+                    Array.from({ length: 5 }).map((_, index) => (
+                      <div key={index} className="flex items-start gap-3 p-2">
+                        <Skeleton className="w-4 h-4 rounded-full mt-1" />
+                        <div className="flex-1 space-y-1">
+                          <Skeleton className="h-4 w-full" />
+                          <Skeleton className="h-3 w-20" />
+                        </div>
                       </div>
+                    ))
+                  ) : activities && activities.length > 0 ? (
+                    activities.map((activity) => (
+                      <div key={activity.id} className="flex items-start gap-3 p-2 rounded-lg hover:bg-muted/50">
+                        {getActivityIcon(activity.kind)}
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium leading-relaxed">
+                            {activity.description}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {formatTimeAgo(activity.created_at)}
+                          </p>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center text-muted-foreground text-sm">
+                      No recent activity
                     </div>
-                  ))}
+                  )}
                 </div>
               </CardContent>
             </Card>
