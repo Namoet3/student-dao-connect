@@ -1,8 +1,9 @@
 import { Button } from "@/components/ui/button";
-import { Wallet, Menu, Search, Bell, ChevronDown, User } from "lucide-react";
+import { Wallet, Menu, Search, ChevronDown, User } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useWallet } from "@/hooks/useWallet";
 import { useAuth } from "@/contexts/AuthContext";
+import { NotificationsBell } from "@/components/NotificationsBell";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -84,9 +85,7 @@ const MainHeader = () => {
               />
             </div>
             
-            <Button variant="ghost" size="icon" className="hidden md:flex">
-              <Bell className="w-4 h-4" />
-            </Button>
+            {user && <NotificationsBell />}
             
             {user ? (
               <DropdownMenu>

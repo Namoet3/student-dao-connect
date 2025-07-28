@@ -17,8 +17,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Textarea } from '@/components/ui/textarea';
 import { Skeleton } from '@/components/ui/skeleton';
+import { ApplicationModal } from '@/components/ApplicationModal';
+import { useUpdateApplicationStatus } from '@/hooks/useApplications';
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -258,29 +259,15 @@ export const ProjectDetail = () => {
                 </CardContent>
               </Card>
 
-              {/* Apply Panel - Only for non-owners */}
+              {/* Apply Button - Only for non-owners */}
               {canApply && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Apply to this Project</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <Textarea
-                      placeholder="Write a compelling cover letter explaining why you're the perfect fit for this project..."
-                      value={coverLetter}
-                      onChange={(e) => setCoverLetter(e.target.value)}
-                      className="min-h-[120px]"
-                    />
-                    <Button 
-                      onClick={handleApply}
-                      disabled={isApplying || !coverLetter.trim()}
-                      className="w-full"
-                      size="lg"
-                    >
-                      {isApplying ? 'Submitting Application...' : 'Submit Application'}
+                <div className="flex justify-center">
+                  <ApplicationModal projectId={project.id} projectTitle={project.title}>
+                    <Button size="lg" className="w-full lg:w-auto">
+                      Apply to this Project
                     </Button>
-                  </CardContent>
-                </Card>
+                  </ApplicationModal>
+                </div>
               )}
 
               {/* Applications List - Only for project owner */}

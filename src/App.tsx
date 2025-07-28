@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { NotificationsProvider } from "@/contexts/NotificationsContext";
 import { HelmetProvider } from "react-helmet-async";
 import MainHeader from "@/components/layout/MainHeader";
 import Index from "./pages/Index";
@@ -15,6 +16,7 @@ import NotFound from "./pages/NotFound";
 import { Projects } from "./pages/Projects";
 import { PostProject } from "./pages/PostProject";
 import { ProjectDetail } from "./pages/ProjectDetail";
+import { MyApplications } from "./pages/MyApplications";
 
 const queryClient = new QueryClient();
 
@@ -33,6 +35,7 @@ const AppLayout = () => {
         <Route path="/projects" element={<Projects />} />
         <Route path="/projects/new" element={<PostProject />} />
         <Route path="/projects/:id" element={<ProjectDetail />} />
+        <Route path="/my-applications" element={<MyApplications />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
@@ -45,11 +48,13 @@ const App = () => (
     <HelmetProvider>
       <TooltipProvider>
         <AuthProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <AppLayout />
-          </BrowserRouter>
+          <NotificationsProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <AppLayout />
+            </BrowserRouter>
+          </NotificationsProvider>
         </AuthProvider>
       </TooltipProvider>
     </HelmetProvider>
