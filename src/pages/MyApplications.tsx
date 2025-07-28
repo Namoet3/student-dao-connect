@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
+import { ApplicationActions } from '@/components/ApplicationActions';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { Application, Project } from '@/types/database';
@@ -221,7 +222,7 @@ export const MyApplications = () => {
                         )}
                         
                         {application.cover_letter && (
-                          <div>
+                          <div className="mb-4">
                             <h4 className="font-medium mb-2">Your Cover Letter</h4>
                             <div className="bg-muted/50 rounded-lg p-3">
                               <p className="text-sm leading-relaxed">
@@ -230,6 +231,24 @@ export const MyApplications = () => {
                             </div>
                           </div>
                         )}
+                        
+                        {application.feedback && (
+                          <div className="mb-4">
+                            <h4 className="font-medium mb-2">Feedback</h4>
+                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                              <p className="text-sm leading-relaxed text-blue-800">
+                                {application.feedback}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="flex justify-end">
+                          <ApplicationActions 
+                            application={application} 
+                            isApplicant={true} 
+                          />
+                        </div>
                       </CardContent>
                     </Card>
                   ))}

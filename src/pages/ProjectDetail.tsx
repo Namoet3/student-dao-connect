@@ -19,7 +19,8 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ApplicationModal } from '@/components/ApplicationModal';
-import { useUpdateApplicationStatus } from '@/hooks/useApplications';
+import { ApplicationManagement } from '@/components/ApplicationManagement';
+import { useUpdateApplicationStatus, useWithdrawApplication, useUpdateApplication } from '@/hooks/useApplications';
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -270,54 +271,20 @@ export const ProjectDetail = () => {
                 </div>
               )}
 
-              {/* Applications List - Only for project owner */}
-              {isOwner && project.applications && project.applications.length > 0 && (
+              {/* Applications Management - Only for project owner */}
+              {isOwner && (
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <MessageCircle className="h-5 w-5" />
-                      Applications ({project.applications.length})
+                      Applications ({project.applications?.length || 0})
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
-                      {project.applications.slice(0, 5).map((application) => (
-                        <div key={application.id} className="border rounded-lg p-4 space-y-3">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              <User className="h-4 w-4" />
-                              <span className="font-medium">
-                                {formatAddress(application.applicant_id)}
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <Badge variant="outline" className={
-                                application.status === 'pending' ? 'border-yellow-500 text-yellow-700' :
-                                application.status === 'accepted' ? 'border-green-500 text-green-700' :
-                                'border-red-500 text-red-700'
-                              }>
-                                {application.status}
-                              </Badge>
-                              <span className="text-xs text-muted-foreground">
-                                {formatDistanceToNow(new Date(application.created_at), { addSuffix: true })}
-                              </span>
-                            </div>
-                          </div>
-                          {application.cover_letter && (
-                            <div className="bg-muted/50 rounded-md p-3">
-                              <p className="text-sm leading-relaxed">
-                                {application.cover_letter}
-                              </p>
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                      {project.applications.length > 5 && (
-                        <p className="text-center text-muted-foreground text-sm">
-                          and {project.applications.length - 5} more applications...
-                        </p>
-                      )}
-                    </div>
+                    <ApplicationManagement 
+                      applications={project.applications || []} 
+                      isOwner={isOwner} 
+                    />
                   </CardContent>
                 </Card>
               )}

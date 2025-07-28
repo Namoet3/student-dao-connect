@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { Plus, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ProjectCard } from '@/components/ProjectCard';
 import { ProjectFilters } from '@/components/ProjectFilters';
 import { EmptyState } from '@/components/EmptyState';
+import { MyProjectsTab } from '@/components/MyProjectsTab';
 import { useProjects, ProjectFilters as FilterType } from '@/hooks/useProjects';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
@@ -121,62 +123,75 @@ export const Projects = () => {
         </Button>
       </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Filters Sidebar */}
-          <div className="lg:col-span-1">
-            <ProjectFilters filters={filters} onFiltersChange={setFilters} />
-          </div>
+      <Tabs defaultValue="all" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="all">All Projects</TabsTrigger>
+          <TabsTrigger value="my-projects">My Projects</TabsTrigger>
+        </TabsList>
 
-          {/* Projects Grid */}
-          <div className="lg:col-span-3">
-            {isLoading ? (
-              <div className="flex items-center justify-center py-12">
-                <Loader2 className="h-8 w-8 animate-spin" />
-              </div>
-            ) : projects.length === 0 ? (
-              <EmptyState
-                title="No projects found"
-                description="No projects match your current filters. Try adjusting your search criteria or post the first project!"
-                actionLabel="Create Project"
-                onAction={handlePostProject}
-              />
-            ) : (
-              <>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {projects.map((project) => (
-                    <Link key={project.id} to={`/projects/${project.id}`}>
-                      <ProjectCard
-                        project={project}
-                        onApply={handleApply}
-                      />
-                    </Link>
-                  ))}
+        <TabsContent value="all" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            {/* Filters Sidebar */}
+            <div className="lg:col-span-1">
+              <ProjectFilters filters={filters} onFiltersChange={setFilters} />
+            </div>
+
+            {/* Projects Grid */}
+            <div className="lg:col-span-3">
+              {isLoading ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="h-8 w-8 animate-spin" />
                 </div>
-
-                {/* Load More */}
-                {hasNextPage && (
-                  <div className="flex justify-center mt-8">
-                    <Button
-                      variant="outline"
-                      onClick={() => fetchNextPage()}
-                      disabled={isFetchingNextPage}
-                      className="gap-2"
-                    >
-                      {isFetchingNextPage ? (
-                        <>
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                          Loading...
-                        </>
-                      ) : (
-                        'Load More Projects'
-                      )}
-                    </Button>
+              ) : projects.length === 0 ? (
+                <EmptyState
+                  title="No projects found"
+                  description="No projects match your current filters. Try adjusting your search criteria or post the first project!"
+                  actionLabel="Create Project"
+                  onAction={handlePostProject}
+                />
+              ) : (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {projects.map((project) => (
+                      <Link key={project.id} to={`/projects/${project.id}`}>
+                        <ProjectCard
+                          project={project}
+                          onApply={handleApply}
+                        />
+                      </Link>
+                    ))}
                   </div>
-                )}
-              </>
-            )}
+
+                  {/* Load More */}
+                  {hasNextPage && (
+                    <div className="flex justify-center mt-8">
+                      <Button
+                        variant="outline"
+                        onClick={() => fetchNextPage()}
+                        disabled={isFetchingNextPage}
+                        className="gap-2"
+                      >
+                        {isFetchingNextPage ? (
+                          <>
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            Loading...
+                          </>
+                        ) : (
+                          'Load More Projects'
+                        )}
+                      </Button>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
           </div>
-        </div>
-      </div>
+        </TabsContent>
+
+        <TabsContent value="my-projects">
+          <MyProjectsTab />
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 };

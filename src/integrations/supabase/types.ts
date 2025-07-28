@@ -19,6 +19,7 @@ export type Database = {
           applicant_id: string | null
           cover_letter: string | null
           created_at: string | null
+          feedback: string | null
           id: string
           project_id: string | null
           status: string | null
@@ -27,6 +28,7 @@ export type Database = {
           applicant_id?: string | null
           cover_letter?: string | null
           created_at?: string | null
+          feedback?: string | null
           id?: string
           project_id?: string | null
           status?: string | null
@@ -35,6 +37,7 @@ export type Database = {
           applicant_id?: string | null
           cover_letter?: string | null
           created_at?: string | null
+          feedback?: string | null
           id?: string
           project_id?: string | null
           status?: string | null

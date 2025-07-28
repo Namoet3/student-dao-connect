@@ -16,6 +16,7 @@ export interface Application {
   cover_letter: string | null;
   status: 'pending' | 'accepted' | 'rejected';
   created_at: string;
+  feedback?: string | null;
 }
 
 export interface ProjectWithApplications extends Project {
