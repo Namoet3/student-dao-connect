@@ -102,7 +102,10 @@ const MainHeader = () => {
                     <ChevronDown className="w-4 h-4" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
+                <DropdownMenuContent 
+                  align="end" 
+                  className="z-50 min-w-[180px] bg-background border border-border shadow-lg"
+                >
                   <DropdownMenuItem onClick={handleProfileClick}>
                     <User className="w-4 h-4 mr-2" />
                     My Profile
