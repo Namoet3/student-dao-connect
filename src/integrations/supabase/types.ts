@@ -39,15 +39,7 @@ export type Database = {
           project_id?: string | null
           status?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "applications_project_id_fkey"
-            columns: ["project_id"]
-            isOneToOne: false
-            referencedRelation: "projects"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       projects: {
         Row: {
