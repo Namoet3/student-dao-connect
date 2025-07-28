@@ -1,3 +1,4 @@
+import React from "react";
 import { Button } from "@/components/ui/button";
 import { LegacyProjectCard } from "./LegacyProjectCard";
 import { ArrowRight } from "lucide-react";
