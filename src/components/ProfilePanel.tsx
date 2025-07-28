@@ -97,7 +97,7 @@ const ProfilePanel = ({ isOpen, onClose, walletAddress, onDisconnect }: ProfileP
                           <div className="flex items-center justify-center gap-1 mb-2">
                             <Trophy className="w-4 h-4 text-yellow-500" />
                             <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">
-                              847
+                              NaN
                             </Badge>
                           </div>
                         </TooltipTrigger>
