@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { Plus, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ProjectCard } from '@/components/ProjectCard';
@@ -12,7 +12,17 @@ import { toast } from '@/hooks/use-toast';
 export const Projects = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [filters, setFilters] = useState<FilterType>({ status: 'all' });
+  const [searchParams, setSearchParams] = useSearchParams();
+  
+  // Initialize filters from URL params
+  const [filters, setFilters] = useState<FilterType>(() => {
+    const status = searchParams.get('status') as FilterType['status'] || 'all';
+    const search = searchParams.get('q') || undefined;
+    const budgetMin = searchParams.get('min') ? parseFloat(searchParams.get('min')!) : undefined;
+    const budgetMax = searchParams.get('max') ? parseFloat(searchParams.get('max')!) : undefined;
+    
+    return { status, search, budgetMin, budgetMax };
+  });
   
   const {
     data,
@@ -46,6 +56,26 @@ export const Projects = () => {
     navigate('/projects/new');
   };
 
+  // Update URL when filters change
+  useEffect(() => {
+    const params = new URLSearchParams();
+    
+    if (filters.status && filters.status !== 'all') {
+      params.set('status', filters.status);
+    }
+    if (filters.search) {
+      params.set('q', filters.search);
+    }
+    if (filters.budgetMin !== undefined) {
+      params.set('min', filters.budgetMin.toString());
+    }
+    if (filters.budgetMax !== undefined) {
+      params.set('max', filters.budgetMax.toString());
+    }
+    
+    setSearchParams(params, { replace: true });
+  }, [filters, setSearchParams]);
+
   // Infinite scroll
   useEffect(() => {
     const handleScroll = () => {
@@ -77,20 +107,19 @@ export const Projects = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold">Projects</h1>
-            <p className="text-muted-foreground">
-              Discover and apply to exciting projects from the community
-            </p>
-          </div>
-          <Button onClick={handlePostProject} className="gap-2">
-            <Plus className="h-4 w-4" />
-            Post Project
-          </Button>
+    <div className="container mx-auto px-4 py-8">
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-3xl font-bold">Projects</h1>
+          <p className="text-muted-foreground">
+            Discover and apply to exciting projects from the community
+          </p>
         </div>
+        <Button onClick={handlePostProject} className="gap-2">
+          <Plus className="h-4 w-4" />
+          Create Project
+        </Button>
+      </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Filters Sidebar */}
@@ -108,18 +137,19 @@ export const Projects = () => {
               <EmptyState
                 title="No projects found"
                 description="No projects match your current filters. Try adjusting your search criteria or post the first project!"
-                actionLabel="Post a Project"
+                actionLabel="Create Project"
                 onAction={handlePostProject}
               />
             ) : (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {projects.map((project) => (
-                    <ProjectCard
-                      key={project.id}
-                      project={project}
-                      onApply={handleApply}
-                    />
+                    <Link key={project.id} to={`/projects/${project.id}`}>
+                      <ProjectCard
+                        project={project}
+                        onApply={handleApply}
+                      />
+                    </Link>
                   ))}
                 </div>
 
@@ -148,6 +178,5 @@ export const Projects = () => {
           </div>
         </div>
       </div>
-    </div>
   );
 };

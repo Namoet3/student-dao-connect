@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Clock, DollarSign, User } from 'lucide-react';
 import { Project } from '@/types/database';
+import { cn } from '@/lib/utils';
 
 interface ProjectCardProps {
   project: Project;
@@ -38,7 +39,10 @@ export const ProjectCard = ({ project, onApply }: ProjectCardProps) => {
   };
 
   return (
-    <Card className="h-full hover:shadow-lg transition-shadow">
+    <Card className={cn(
+      "h-full hover:shadow-lg transition-all duration-200 cursor-pointer",
+      "hover:scale-[1.02] hover:shadow-xl"
+    )}>
       <CardHeader>
         <div className="flex items-start justify-between">
           <div className="flex-1">
@@ -64,7 +68,7 @@ export const ProjectCard = ({ project, onApply }: ProjectCardProps) => {
         <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
           <div className="flex items-center gap-1">
             <DollarSign className="h-4 w-4" />
-            <span>{formatBudget(project.budget_min, project.budget_max)}</span>
+            <span className="font-semibold text-primary">{formatBudget(project.budget_min, project.budget_max)}</span>
           </div>
           <div className="flex items-center gap-1">
             <Clock className="h-4 w-4" />
@@ -75,7 +79,11 @@ export const ProjectCard = ({ project, onApply }: ProjectCardProps) => {
         {project.status === 'open' && onApply && (
           <Button 
             className="w-full" 
-            onClick={() => onApply(project.id)}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onApply(project.id);
+            }}
           >
             Apply Now
           </Button>

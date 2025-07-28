@@ -58,20 +58,32 @@ export const useProject = (id: string) => {
   return useQuery({
     queryKey: ['project', id],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // Fetch project data
+      const { data: project, error: projectError } = await supabase
         .from('projects')
-        .select(`
-          *,
-          applications (*)
-        `)
+        .select('*')
         .eq('id', id)
         .single();
 
-      if (error) {
-        throw new Error(error.message);
+      if (projectError) {
+        throw new Error(projectError.message);
       }
 
-      return data as ProjectWithApplications;
+      // Fetch applications for this project
+      const { data: applications, error: applicationsError } = await supabase
+        .from('applications')
+        .select('*')
+        .eq('project_id', id)
+        .order('created_at', { ascending: false });
+
+      if (applicationsError) {
+        console.warn('Failed to fetch applications:', applicationsError.message);
+      }
+
+      return {
+        ...project,
+        applications: applications || []
+      } as ProjectWithApplications;
     },
     enabled: !!id,
   });

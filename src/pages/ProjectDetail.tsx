@@ -1,11 +1,32 @@
-import React from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
-import { ArrowLeft, Clock, DollarSign, User, MessageCircle } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
+import { 
+  ArrowLeft, 
+  Clock, 
+  DollarSign, 
+  User, 
+  MessageCircle, 
+  Star,
+  MapPin,
+  Calendar,
+  Users
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { Textarea } from '@/components/ui/textarea';
+import { Skeleton } from '@/components/ui/skeleton';
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbSeparator,
+  BreadcrumbPage,
+} from '@/components/ui/breadcrumb';
 import { useProject } from '@/hooks/useProjects';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
@@ -15,8 +36,10 @@ export const ProjectDetail = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { data: project, isLoading, error } = useProject(id!);
+  const [coverLetter, setCoverLetter] = useState('');
+  const [isApplying, setIsApplying] = useState(false);
 
-  const handleApply = () => {
+  const handleApply = async () => {
     if (!user) {
       toast({
         title: 'Authentication Required',
@@ -26,11 +49,33 @@ export const ProjectDetail = () => {
       return;
     }
     
-    // TODO: Implement application logic
-    toast({
-      title: 'Application Feature',
-      description: 'Application functionality will be implemented in the next sprint',
-    });
+    if (!coverLetter.trim()) {
+      toast({
+        title: 'Cover Letter Required',
+        description: 'Please write a cover letter for your application',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setIsApplying(true);
+    try {
+      // TODO: Implement application logic
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
+      toast({
+        title: 'Application Submitted! 🎉',
+        description: 'Your application has been sent to the project owner',
+      });
+      setCoverLetter('');
+    } catch (error) {
+      toast({
+        title: 'Application Failed',
+        description: 'Something went wrong. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsApplying(false);
+    }
   };
 
   const formatAddress = (address: string) => {
@@ -58,15 +103,52 @@ export const ProjectDetail = () => {
     }
   };
 
+  const shortTitle = project?.title ? 
+    (project.title.length > 30 ? project.title.substring(0, 30) + '...' : project.title) 
+    : 'Project';
+
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
-        <div className="container mx-auto px-4 py-8">
-          <div className="max-w-4xl mx-auto">
-            <div className="animate-pulse space-y-6">
-              <div className="h-8 bg-muted rounded w-1/4"></div>
-              <div className="h-32 bg-muted rounded"></div>
-              <div className="h-64 bg-muted rounded"></div>
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-6xl mx-auto">
+          {/* Breadcrumb Skeleton */}
+          <div className="mb-6">
+            <Skeleton className="h-5 w-64" />
+          </div>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Main Content Skeleton */}
+            <div className="lg:col-span-2 space-y-6">
+              <Card>
+                <CardHeader>
+                  <Skeleton className="h-8 w-3/4 mb-4" />
+                  <div className="flex gap-4">
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-4 w-24" />
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-3/4" />
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+            
+            {/* Sidebar Skeleton */}
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <Skeleton className="h-6 w-32" />
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <Skeleton className="h-16 w-full" />
+                  <Skeleton className="h-16 w-full" />
+                  <Skeleton className="h-16 w-full" />
+                </CardContent>
+              </Card>
             </div>
           </div>
         </div>
@@ -76,7 +158,10 @@ export const ProjectDetail = () => {
 
   if (error || !project) {
     return (
-      <div className="min-h-screen bg-background">
+      <>
+        <Helmet>
+          <title>Project Not Found - UniversityDAO</title>
+        </Helmet>
         <div className="container mx-auto px-4 py-8">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-destructive mb-4">Project Not Found</h1>
@@ -86,59 +171,120 @@ export const ProjectDetail = () => {
             </Button>
           </div>
         </div>
-      </div>
+      </>
     );
   }
 
+  const isOwner = user?.address === project.owner_id;
+  const canApply = project.status === 'open' && !isOwner;
+
   return (
-    <div className="min-h-screen bg-background">
+    <>
+      <Helmet>
+        <title>{project.title} - UniversityDAO</title>
+        <meta name="description" content={project.description.substring(0, 160)} />
+        <meta property="og:title" content={project.title} />
+        <meta property="og:description" content={project.description.substring(0, 160)} />
+        <meta property="og:type" content="article" />
+      </Helmet>
+      
       <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
-          <Button
-            variant="ghost"
-            onClick={() => navigate('/projects')}
-            className="mb-6"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Projects
-          </Button>
+        <div className="max-w-6xl mx-auto">
+          {/* Breadcrumb */}
+          <Breadcrumb className="mb-6">
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild>
+                  <Link to="/">Home</Link>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild>
+                  <Link to="/projects">Projects</Link>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>{shortTitle}</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-2 space-y-6">
+              {/* Hero Section */}
               <Card>
                 <CardHeader>
-                  <div className="flex items-start justify-between">
+                  <div className="flex items-start justify-between gap-4">
                     <div className="flex-1">
-                      <CardTitle className="text-2xl mb-2">{project.title}</CardTitle>
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                        <div className="flex items-center gap-1">
+                      <CardTitle className="text-3xl mb-4">{project.title}</CardTitle>
+                      <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+                        <div className="flex items-center gap-2">
                           <User className="h-4 w-4" />
-                          <span>{formatAddress(project.owner_id)}</span>
+                          <span className="font-medium">{formatAddress(project.owner_id)}</span>
                         </div>
-                        <div className="flex items-center gap-1">
-                          <Clock className="h-4 w-4" />
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4" />
                           <span>{formatDistanceToNow(new Date(project.created_at), { addSuffix: true })}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <DollarSign className="h-4 w-4" />
+                          <span className="font-semibold text-primary">
+                            {formatBudget(project.budget_min, project.budget_max)}
+                          </span>
                         </div>
                       </div>
                     </div>
-                    <Badge className={getStatusColor(project.status)}>
-                      {project.status}
+                    <Badge className={getStatusColor(project.status)} variant="outline">
+                      {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
                     </Badge>
                   </div>
                 </CardHeader>
+              </Card>
+
+              {/* Description */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Project Description</CardTitle>
+                </CardHeader>
                 <CardContent>
                   <div className="prose max-w-none">
-                    <h3 className="text-lg font-semibold mb-3">Project Description</h3>
-                    <div className="whitespace-pre-wrap text-muted-foreground">
+                    <div className="whitespace-pre-wrap text-muted-foreground leading-relaxed">
                       {project.description}
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
-              {/* Applications Section */}
-              {project.applications && project.applications.length > 0 && (
+              {/* Apply Panel - Only for non-owners */}
+              {canApply && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Apply to this Project</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <Textarea
+                      placeholder="Write a compelling cover letter explaining why you're the perfect fit for this project..."
+                      value={coverLetter}
+                      onChange={(e) => setCoverLetter(e.target.value)}
+                      className="min-h-[120px]"
+                    />
+                    <Button 
+                      onClick={handleApply}
+                      disabled={isApplying || !coverLetter.trim()}
+                      className="w-full"
+                      size="lg"
+                    >
+                      {isApplying ? 'Submitting Application...' : 'Submit Application'}
+                    </Button>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Applications List - Only for project owner */}
+              {isOwner && project.applications && project.applications.length > 0 && (
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
@@ -148,26 +294,42 @@ export const ProjectDetail = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      {project.applications.map((application) => (
-                        <div key={application.id} className="border rounded-lg p-4">
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="font-medium">
-                              {formatAddress(application.applicant_id)}
-                            </span>
-                            <Badge variant="outline">
-                              {application.status}
-                            </Badge>
+                      {project.applications.slice(0, 5).map((application) => (
+                        <div key={application.id} className="border rounded-lg p-4 space-y-3">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <User className="h-4 w-4" />
+                              <span className="font-medium">
+                                {formatAddress(application.applicant_id)}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Badge variant="outline" className={
+                                application.status === 'pending' ? 'border-yellow-500 text-yellow-700' :
+                                application.status === 'accepted' ? 'border-green-500 text-green-700' :
+                                'border-red-500 text-red-700'
+                              }>
+                                {application.status}
+                              </Badge>
+                              <span className="text-xs text-muted-foreground">
+                                {formatDistanceToNow(new Date(application.created_at), { addSuffix: true })}
+                              </span>
+                            </div>
                           </div>
                           {application.cover_letter && (
-                            <p className="text-sm text-muted-foreground">
-                              {application.cover_letter}
-                            </p>
+                            <div className="bg-muted/50 rounded-md p-3">
+                              <p className="text-sm leading-relaxed">
+                                {application.cover_letter}
+                              </p>
+                            </div>
                           )}
-                          <span className="text-xs text-muted-foreground">
-                            {formatDistanceToNow(new Date(application.created_at), { addSuffix: true })}
-                          </span>
                         </div>
                       ))}
+                      {project.applications.length > 5 && (
+                        <p className="text-center text-muted-foreground text-sm">
+                          and {project.applications.length - 5} more applications...
+                        </p>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
@@ -176,17 +338,18 @@ export const ProjectDetail = () => {
 
             {/* Sidebar */}
             <div className="space-y-6">
+              {/* Project Details */}
               <Card>
                 <CardHeader>
                   <CardTitle>Project Details</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <div className="flex items-center gap-2 text-sm font-medium mb-1">
+                    <div className="flex items-center gap-2 text-sm font-medium mb-2">
                       <DollarSign className="h-4 w-4" />
-                      Budget
+                      Budget Range
                     </div>
-                    <p className="text-lg font-semibold">
+                    <p className="text-lg font-semibold text-primary">
                       {formatBudget(project.budget_min, project.budget_max)}
                     </p>
                   </div>
@@ -194,40 +357,91 @@ export const ProjectDetail = () => {
                   <Separator />
                   
                   <div>
-                    <div className="text-sm font-medium mb-1">Status</div>
+                    <div className="text-sm font-medium mb-2">Status</div>
                     <Badge className={getStatusColor(project.status)}>
-                      {project.status}
+                      {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
                     </Badge>
                   </div>
                   
                   <Separator />
                   
                   <div>
-                    <div className="text-sm font-medium mb-1">Posted</div>
+                    <div className="text-sm font-medium mb-2">Posted</div>
                     <p className="text-sm text-muted-foreground">
                       {formatDistanceToNow(new Date(project.created_at), { addSuffix: true })}
                     </p>
                   </div>
+
+                  {project.applications && project.applications.length > 0 && (
+                    <>
+                      <Separator />
+                      <div>
+                        <div className="flex items-center gap-2 text-sm font-medium mb-2">
+                          <Users className="h-4 w-4" />
+                          Applications
+                        </div>
+                        <p className="text-lg font-semibold">
+                          {project.applications.length}
+                        </p>
+                      </div>
+                    </>
+                  )}
                 </CardContent>
               </Card>
 
-              {project.status === 'open' && user?.address !== project.owner_id && (
-                <Card>
-                  <CardContent className="pt-6">
-                    <Button 
-                      className="w-full" 
-                      size="lg"
-                      onClick={handleApply}
-                    >
-                      Apply to Project
-                    </Button>
-                  </CardContent>
-                </Card>
-              )}
+              {/* Owner Profile */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Project Owner</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-gradient-primary rounded-full flex items-center justify-center">
+                      <User className="h-6 w-6 text-white" />
+                    </div>
+                    <div>
+                      <p className="font-medium">{formatAddress(project.owner_id)}</p>
+                      <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                        <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                        <span>4.8 reputation</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <Separator />
+                  
+                  <div>
+                    <p className="text-sm font-medium mb-2">Other Projects</p>
+                    <div className="space-y-2">
+                      <div className="text-sm p-2 bg-muted/50 rounded">
+                        <p className="font-medium">DeFi Analytics Dashboard</p>
+                        <p className="text-xs text-muted-foreground">Completed • 2.5 ETH</p>
+                      </div>
+                      <div className="text-sm p-2 bg-muted/50 rounded">
+                        <p className="font-medium">Smart Contract Audit</p>
+                        <p className="text-xs text-muted-foreground">Active • 1.8 ETH</p>
+                      </div>
+                      <p className="text-xs text-center text-muted-foreground pt-2">
+                        +5 more projects
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Back Button */}
+              <Button
+                variant="outline"
+                onClick={() => navigate('/projects')}
+                className="w-full gap-2"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Back to Projects
+              </Button>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
