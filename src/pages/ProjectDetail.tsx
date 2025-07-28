@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import { Helmet } from 'react-helmet-async';
@@ -19,8 +19,8 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ApplicationModal } from '@/components/ApplicationModal';
-import { ApplicationManagement } from '@/components/ApplicationManagement';
-import { useUpdateApplicationStatus, useWithdrawApplication, useUpdateApplication } from '@/hooks/useApplications';
+import { ApplicationsPanel } from '@/components/ApplicationsPanel';
+import { supabase } from '@/integrations/supabase/client';
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -38,47 +38,33 @@ export const ProjectDetail = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { data: project, isLoading, error, refetch } = useProject(id!);
-  const [coverLetter, setCoverLetter] = useState('');
-  const [isApplying, setIsApplying] = useState(false);
 
-  const handleApply = async () => {
-    if (!user) {
-      toast({
-        title: 'Authentication Required',
-        description: 'Connect wallet first',
-        variant: 'destructive',
-      });
-      return;
-    }
-    
-    if (!coverLetter.trim()) {
-      toast({
-        title: 'Cover Letter Required',
-        description: 'Please write a cover letter for your application',
-        variant: 'destructive',
-      });
-      return;
-    }
+  // Set up realtime subscription for applications
+  useEffect(() => {
+    if (!id) return;
 
-    setIsApplying(true);
-    try {
-      // TODO: Implement application logic
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
-      toast({
-        title: 'Application Submitted! 🎉',
-        description: 'Your application has been sent to the project owner',
-      });
-      setCoverLetter('');
-    } catch (error) {
-      toast({
-        title: 'Application Failed',
-        description: 'Something went wrong. Please try again.',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsApplying(false);
-    }
-  };
+    const channel = supabase
+      .channel('project-applications')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'applications',
+          filter: `project_id=eq.${id}`
+        },
+        () => {
+          // Refetch project data when applications change
+          refetch();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [id, refetch]);
+
 
   const formatAddress = (address: string) => {
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
@@ -179,6 +165,7 @@ export const ProjectDetail = () => {
 
   const isOwner = user?.address === project.owner_id;
   const canApply = project.status === 'open' && !isOwner;
+  const userApplication = project.applications?.find(app => app.applicant_id === user?.address);
 
   return (
     <>
@@ -260,8 +247,8 @@ export const ProjectDetail = () => {
                 </CardContent>
               </Card>
 
-              {/* Apply Button - Only for non-owners */}
-              {canApply && (
+              {/* Apply Button - Only for non-owners who haven't applied */}
+              {canApply && !userApplication && (
                 <div className="flex justify-center">
                   <ApplicationModal projectId={project.id} projectTitle={project.title}>
                     <Button size="lg" className="w-full lg:w-auto">
@@ -271,31 +258,13 @@ export const ProjectDetail = () => {
                 </div>
               )}
 
-              {/* Applications Management - Only for project owner */}
-              {isOwner && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <MessageCircle className="h-5 w-5" />
-                      Applications ({project.applications?.length || 0})
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {!user ? (
-                      <div className="text-center py-8">
-                        <p className="text-muted-foreground">Connect your wallet to view applications</p>
-                        <Button onClick={() => refetch()} variant="outline" className="mt-4">
-                          Refresh
-                        </Button>
-                      </div>
-                    ) : (
-                      <ApplicationManagement 
-                        applications={project.applications || []} 
-                        isOwner={isOwner} 
-                      />
-                    )}
-                  </CardContent>
-                </Card>
+              {/* Applications Panel - Shows user's own application or all applications for owner */}
+              {(isOwner || userApplication || (user && project.applications && project.applications.length > 0)) && (
+                <ApplicationsPanel 
+                  applications={project.applications || []} 
+                  isOwner={isOwner}
+                  projectId={project.id}
+                />
               )}
             </div>
 

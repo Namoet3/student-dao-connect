@@ -4,9 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { toast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { useQueryClient } from '@tanstack/react-query';
+import { useApplicationSubmission } from '@/hooks/useApplicationSubmission';
 
 interface ApplicationModalProps {
   projectId: string;
@@ -22,10 +21,9 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
   children
 }) => {
   const { user } = useAuth();
-  const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [coverLetter, setCoverLetter] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const applicationMutation = useApplicationSubmission();
 
   const handleSubmit = async () => {
     if (!user?.address) {
@@ -46,50 +44,16 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
       return;
     }
 
-    setIsSubmitting(true);
-    try {
-      const { error } = await supabase
-        .from('applications')
-        .insert([{
-          project_id: projectId,
-          applicant_id: user.address,
-          cover_letter: coverLetter.trim(),
-          status: 'pending'
-        }]);
-
-      if (error) {
-        if (error.code === '23505') { // Unique constraint violation
-          toast({
-            title: 'Already Applied',
-            description: 'You have already applied to this project',
-            variant: 'destructive',
-          });
-        } else {
-          throw error;
-        }
-        return;
+    applicationMutation.mutate({
+      projectId,
+      applicantId: user.address,
+      coverLetter
+    }, {
+      onSuccess: () => {
+        setCoverLetter('');
+        setOpen(false);
       }
-
-      // Invalidate and refetch project data to update applications list
-      queryClient.invalidateQueries({ queryKey: ['project', projectId] });
-
-      toast({
-        title: 'Application Sent! 🚀',
-        description: 'Your application has been sent to the project owner',
-      });
-
-      setCoverLetter('');
-      setOpen(false);
-    } catch (error) {
-      console.error('Application submission error:', error);
-      toast({
-        title: 'Application Failed',
-        description: 'Something went wrong. Please try again.',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+    });
   };
 
   return (
@@ -119,15 +83,15 @@ export const ApplicationModal: React.FC<ApplicationModalProps> = ({
             <Button
               variant="outline"
               onClick={() => setOpen(false)}
-              disabled={isSubmitting}
+              disabled={applicationMutation.isPending}
             >
               Cancel
             </Button>
             <Button
               onClick={handleSubmit}
-              disabled={isSubmitting || coverLetter.trim().length < 50}
+              disabled={applicationMutation.isPending || coverLetter.trim().length < 50}
             >
-              {isSubmitting ? 'Submitting...' : 'Submit Application'}
+              {applicationMutation.isPending ? 'Submitting...' : 'Submit Application'}
             </Button>
           </div>
         </div>
