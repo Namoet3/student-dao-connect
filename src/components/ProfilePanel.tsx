@@ -112,7 +112,7 @@ const ProfilePanel = ({ isOpen, onClose, walletAddress, onDisconnect }: ProfileP
                   <div className="text-center">
                     <div className="flex items-center justify-center gap-1 mb-2">
                       <Coins className="w-4 h-4 text-primary" />
-                      <span className="font-semibold">1,250</span>
+                      <span className="font-semibold">NaN</span>
                     </div>
                     <p className="text-xs text-muted-foreground">DAO Tokens</p>
                   </div>
@@ -120,7 +120,7 @@ const ProfilePanel = ({ isOpen, onClose, walletAddress, onDisconnect }: ProfileP
                   <div className="text-center">
                     <div className="flex items-center justify-center gap-1 mb-2">
                       <Shield className="w-4 h-4 text-green-500" />
-                      <span className="font-semibold">2.5 ETH</span>
+                      <span className="font-semibold">NaN ETH</span>
                     </div>
                     <p className="text-xs text-muted-foreground">Escrow</p>
                   </div>
@@ -136,18 +136,18 @@ const ProfilePanel = ({ isOpen, onClose, walletAddress, onDisconnect }: ProfileP
               <CardContent>
                 <div className="grid grid-cols-3 gap-4 text-center">
                   <div>
-                    <div className="text-2xl font-bold text-primary">12</div>
+                    <div className="text-2xl font-bold text-primary">5</div>
                     <p className="text-sm text-muted-foreground">Posted</p>
                     <Button variant="link" className="p-0 h-auto text-xs">
                       View All
                     </Button>
                   </div>
                   <div>
-                    <div className="text-2xl font-bold text-orange-500">3</div>
+                    <div className="text-2xl font-bold text-orange-500">0</div>
                     <p className="text-sm text-muted-foreground">Active</p>
                   </div>
                   <div>
-                    <div className="text-2xl font-bold text-green-500">28</div>
+                    <div className="text-2xl font-bold text-green-500">0</div>
                     <p className="text-sm text-muted-foreground">Completed</p>
                   </div>
                 </div>
