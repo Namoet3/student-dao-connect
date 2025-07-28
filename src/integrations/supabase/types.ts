@@ -118,7 +118,16 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      activities: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string | null
+          kind: string | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never
