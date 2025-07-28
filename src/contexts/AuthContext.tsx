@@ -12,6 +12,7 @@ interface AuthContextType {
   isLoading: boolean;
   login: () => Promise<void>;
   logout: () => void;
+  switchAccount: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -37,7 +38,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
   };
 
-  const login = async () => {
+  const connectWallet = async () => {
     if (!window.ethereum) {
       toast({
         title: "MetaMask Required",
@@ -50,7 +51,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     setIsLoading(true);
 
     try {
-      // Request account access
+      // First request permissions to force account chooser
+      await window.ethereum.request({
+        method: 'wallet_requestPermissions',
+        params: [{ eth_accounts: {} }]
+      });
+
+      // Then request accounts
       const accounts = await window.ethereum.request({
         method: 'eth_requestAccounts',
       });
@@ -116,6 +123,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   };
 
+  const login = connectWallet;
+  const switchAccount = connectWallet;
+
   const logout = async () => {
     setUser(null);
     
@@ -176,27 +186,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     };
   }, [user]);
 
-  // Check if wallet is already connected on app start (but don't auto-login)
-  useEffect(() => {
-    const checkConnection = async () => {
-      if (window.ethereum) {
-        try {
-          const accounts = await window.ethereum.request({
-            method: 'eth_accounts',
-          });
-          // We don't auto-login even if accounts exist
-          // User must explicitly click "Connect Wallet"
-        } catch (error) {
-          console.error('Failed to check wallet connection:', error);
-        }
-      }
-    };
-
-    checkConnection();
-  }, []);
+  // No auto-connection on app start - user must explicitly connect
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, logout }}>
+    <AuthContext.Provider value={{ user, isLoading, login, logout, switchAccount }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Wallet, Menu, Search, ChevronDown, User, Users } from "lucide-react";
+import { Wallet, Menu, Search, ChevronDown, User, ArrowRightLeft } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useWallet } from "@/hooks/useWallet";
 import { useAuth } from "@/contexts/AuthContext";
@@ -11,15 +11,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import ProfilePanel from "../ProfilePanel";
-import { AccountsModal } from "../AccountsModal";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 
 const MainHeader = () => {
   const { formatAddress } = useWallet();
-  const { user, isLoading, login, logout } = useAuth();
+  const { user, isLoading, login, logout, switchAccount } = useAuth();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [isAccountsOpen, setIsAccountsOpen] = useState(false);
   const location = useLocation();
 
   const handleWalletAction = async () => {
@@ -35,8 +33,8 @@ const MainHeader = () => {
     setIsProfileOpen(true);
   };
 
-  const handleAccountsClick = () => {
-    setIsAccountsOpen(true);
+  const handleSwitchAccount = async () => {
+    await switchAccount();
   };
 
   const isActivePath = (path: string) => {
@@ -110,9 +108,9 @@ const MainHeader = () => {
                     <User className="w-4 h-4 mr-2" />
                     My Profile
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleAccountsClick}>
-                    <Users className="w-4 h-4 mr-2" />
-                    Accounts
+                  <DropdownMenuItem onClick={handleSwitchAccount}>
+                    <ArrowRightLeft className="w-4 h-4 mr-2" />
+                    Switch Account
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleWalletAction}>
                     Sign Out
@@ -147,10 +145,6 @@ const MainHeader = () => {
         />
       )}
 
-      <AccountsModal
-        isOpen={isAccountsOpen}
-        onClose={() => setIsAccountsOpen(false)}
-      />
     </>
   );
 };
