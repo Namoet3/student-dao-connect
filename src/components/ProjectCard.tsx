@@ -1,87 +1,86 @@
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Clock, DollarSign, Star, MapPin } from "lucide-react";
+import React from 'react';
+import { formatDistanceToNow } from 'date-fns';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Clock, DollarSign, User } from 'lucide-react';
+import { Project } from '@/types/database';
 
 interface ProjectCardProps {
-  title: string;
-  company: string;
-  description: string;
-  budget: string;
-  duration: string;
-  location: string;
-  skills: string[];
-  rating: number;
-  proposals: number;
+  project: Project;
+  onApply?: (projectId: string) => void;
 }
 
-const ProjectCard = ({ 
-  title, 
-  company, 
-  description, 
-  budget, 
-  duration, 
-  location, 
-  skills, 
-  rating, 
-  proposals 
-}: ProjectCardProps) => {
+export const ProjectCard = ({ project, onApply }: ProjectCardProps) => {
+  const formatAddress = (address: string) => {
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  };
+
+  const formatBudget = (min: number | null, max: number | null) => {
+    if (!min && !max) return 'Budget negotiable';
+    if (min && max) return `${min}-${max} ETH`;
+    if (min) return `${min}+ ETH`;
+    if (max) return `Up to ${max} ETH`;
+    return 'Budget negotiable';
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'open':
+        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100';
+      case 'active':
+        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100';
+      case 'completed':
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-100';
+      default:
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-100';
+    }
+  };
+
   return (
-    <Card className="group hover:shadow-lg transition-all duration-300 border-border hover:border-primary/20">
+    <Card className="h-full hover:shadow-lg transition-shadow">
       <CardHeader>
-        <div className="flex justify-between items-start mb-2">
-          <CardTitle className="text-lg text-foreground group-hover:text-primary transition-colors">
-            {title}
-          </CardTitle>
-          <div className="flex items-center gap-1">
-            <Star className="w-4 h-4 text-yellow-500 fill-current" />
-            <span className="text-sm text-muted-foreground">{rating}</span>
+        <div className="flex items-start justify-between">
+          <div className="flex-1">
+            <h3 className="text-lg font-semibold line-clamp-2 mb-2">
+              {project.title}
+            </h3>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+              <User className="h-4 w-4" />
+              <span>{formatAddress(project.owner_id)}</span>
+            </div>
           </div>
+          <Badge className={getStatusColor(project.status)}>
+            {project.status}
+          </Badge>
         </div>
-        <CardDescription className="text-primary font-medium">
-          {company}
-        </CardDescription>
       </CardHeader>
       
-      <CardContent className="space-y-4">
-        <p className="text-muted-foreground text-sm leading-relaxed line-clamp-3">
-          {description}
+      <CardContent>
+        <p className="text-sm text-muted-foreground line-clamp-3 mb-4">
+          {project.description}
         </p>
         
-        <div className="flex flex-wrap gap-2">
-          {skills.map((skill, index) => (
-            <Badge key={index} variant="secondary" className="text-xs">
-              {skill}
-            </Badge>
-          ))}
-        </div>
-        
-        <div className="grid grid-cols-3 gap-4 text-sm">
+        <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
           <div className="flex items-center gap-1">
-            <DollarSign className="w-4 h-4 text-primary" />
-            <span className="text-foreground font-medium">{budget}</span>
+            <DollarSign className="h-4 w-4" />
+            <span>{formatBudget(project.budget_min, project.budget_max)}</span>
           </div>
           <div className="flex items-center gap-1">
-            <Clock className="w-4 h-4 text-primary" />
-            <span className="text-muted-foreground">{duration}</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <MapPin className="w-4 h-4 text-primary" />
-            <span className="text-muted-foreground">{location}</span>
+            <Clock className="h-4 w-4" />
+            <span>{formatDistanceToNow(new Date(project.created_at), { addSuffix: true })}</span>
           </div>
         </div>
+
+        {project.status === 'open' && onApply && (
+          <Button 
+            className="w-full" 
+            onClick={() => onApply(project.id)}
+          >
+            Apply Now
+          </Button>
+        )}
       </CardContent>
-      
-      <CardFooter className="flex justify-between items-center">
-        <span className="text-sm text-muted-foreground">
-          {proposals} proposals
-        </span>
-        <Button variant="hero" size="sm">
-          Apply Now
-        </Button>
-      </CardFooter>
     </Card>
   );
 };
-
-export default ProjectCard;

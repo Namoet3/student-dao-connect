@@ -14,39 +14,107 @@ export type Database = {
   }
   public: {
     Tables: {
-      wallet_connections: {
+      applications: {
         Row: {
+          applicant_id: string | null
+          cover_letter: string | null
+          created_at: string | null
           id: string
-          wallet_address: string
-          connected_at: string
-          last_connected_at: string
-          connection_count: number
-          user_agent: string | null
-          ip_address: string | null
-          created_at: string
-          updated_at: string
+          project_id: string | null
+          status: string | null
         }
         Insert: {
+          applicant_id?: string | null
+          cover_letter?: string | null
+          created_at?: string | null
           id?: string
-          wallet_address: string
-          connected_at?: string
-          last_connected_at?: string
-          connection_count?: number
-          user_agent?: string | null
-          ip_address?: string | null
-          created_at?: string
-          updated_at?: string
+          project_id?: string | null
+          status?: string | null
         }
         Update: {
+          applicant_id?: string | null
+          cover_letter?: string | null
+          created_at?: string | null
           id?: string
-          wallet_address?: string
-          connected_at?: string
-          last_connected_at?: string
-          connection_count?: number
-          user_agent?: string | null
+          project_id?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "applications_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      projects: {
+        Row: {
+          budget_max: number | null
+          budget_min: number | null
+          created_at: string | null
+          description: string
+          id: string
+          owner_id: string | null
+          status: string | null
+          title: string
+        }
+        Insert: {
+          budget_max?: number | null
+          budget_min?: number | null
+          created_at?: string | null
+          description: string
+          id?: string
+          owner_id?: string | null
+          status?: string | null
+          title: string
+        }
+        Update: {
+          budget_max?: number | null
+          budget_min?: number | null
+          created_at?: string | null
+          description?: string
+          id?: string
+          owner_id?: string | null
+          status?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
+      wallet_connections: {
+        Row: {
+          connected_at: string | null
+          connection_count: number | null
+          created_at: string | null
+          id: string
+          ip_address: string | null
+          last_connected_at: string | null
+          updated_at: string | null
+          user_agent: string | null
+          wallet_address: string
+        }
+        Insert: {
+          connected_at?: string | null
+          connection_count?: number | null
+          created_at?: string | null
+          id?: string
           ip_address?: string | null
-          created_at?: string
-          updated_at?: string
+          last_connected_at?: string | null
+          updated_at?: string | null
+          user_agent?: string | null
+          wallet_address: string
+        }
+        Update: {
+          connected_at?: string | null
+          connection_count?: number | null
+          created_at?: string | null
+          id?: string
+          ip_address?: string | null
+          last_connected_at?: string | null
+          updated_at?: string | null
+          user_agent?: string | null
+          wallet_address?: string
         }
         Relationships: []
       }

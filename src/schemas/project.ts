@@ -1,0 +1,30 @@
+import { z } from 'zod';
+
+export const projectSchema = z.object({
+  title: z
+    .string()
+    .min(8, 'Title must be at least 8 characters')
+    .max(100, 'Title must be less than 100 characters'),
+  description: z
+    .string()
+    .min(20, 'Description must be at least 20 characters')
+    .max(2000, 'Description must be less than 2000 characters'),
+  budget_min: z
+    .number()
+    .min(0, 'Minimum budget must be positive')
+    .optional(),
+  budget_max: z
+    .number()
+    .min(0, 'Maximum budget must be positive')
+    .optional(),
+}).refine((data) => {
+  if (data.budget_min && data.budget_max) {
+    return data.budget_min <= data.budget_max;
+  }
+  return true;
+}, {
+  message: 'Minimum budget must be less than or equal to maximum budget',
+  path: ['budget_max'],
+});
+
+export type ProjectFormData = z.infer<typeof projectSchema>;

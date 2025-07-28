@@ -9,6 +9,9 @@ import ForStudents from "./pages/ForStudents";
 import ForEmployers from "./pages/ForEmployers";
 import Roadmap from "./pages/Roadmap";
 import NotFound from "./pages/NotFound";
+import { Projects } from "./pages/Projects";
+import { PostProject } from "./pages/PostProject";
+import { ProjectDetail } from "./pages/ProjectDetail";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +27,9 @@ const App = () => (
             <Route path="/for-students" element={<ForStudents />} />
             <Route path="/for-employers" element={<ForEmployers />} />
             <Route path="/roadmap" element={<Roadmap />} />
+            <Route path="/projects" element={<Projects />} />
+            <Route path="/projects/new" element={<PostProject />} />
+            <Route path="/projects/:id" element={<ProjectDetail />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

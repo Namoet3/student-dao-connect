@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { X, Edit3, Trophy, Coins, Shield, Plus, ArrowDownToLine, Vote, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,6 +14,8 @@ interface ProfilePanelProps {
 }
 
 const ProfilePanel = ({ isOpen, onClose, walletAddress, onDisconnect }: ProfilePanelProps) => {
+  const navigate = useNavigate();
+  
   const formatAddress = (address: string) => {
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
   };
@@ -182,7 +185,11 @@ const ProfilePanel = ({ isOpen, onClose, walletAddress, onDisconnect }: ProfileP
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 gap-3">
-                  <Button variant="outline" className="h-auto p-4 flex flex-col gap-2">
+                  <Button 
+                    variant="outline" 
+                    className="h-auto p-4 flex flex-col gap-2"
+                    onClick={() => navigate('/projects/new')}
+                  >
                     <Plus className="w-5 h-5" />
                     <span className="text-xs">Post Project</span>
                   </Button>

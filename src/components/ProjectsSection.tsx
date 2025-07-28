@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import ProjectCard from "./ProjectCard";
+import { LegacyProjectCard } from "./LegacyProjectCard";
 import { ArrowRight } from "lucide-react";
 
 const ProjectsSection = () => {
@@ -64,7 +64,7 @@ const ProjectsSection = () => {
         
         <div className="grid md:grid-cols-2 gap-8 mb-12">
           {featuredProjects.map((project, index) => (
-            <ProjectCard key={index} {...project} />
+            <LegacyProjectCard key={index} {...project} />
           ))}
         </div>
         
