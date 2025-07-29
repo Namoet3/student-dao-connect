@@ -38,7 +38,6 @@ const ForStudents = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
       
       {/* Hero Section */}
       <section className="py-20 bg-gradient-hero">
