@@ -39,6 +39,23 @@ const ForEmployers = () => {
   return (
     <div className="min-h-screen bg-background">
       
+      {/* Hero Section */}
+      <section className="py-20 bg-gradient-hero">
+        <div className="container">
+          <div className="text-center">
+            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
+              For Employers
+            </h1>
+            <p className="text-xl text-white/90 max-w-3xl mx-auto mb-8">
+              Connect with the next generation of talent. Access skilled students and recent graduates for your projects while contributing to their professional development.
+            </p>
+            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 max-w-md mx-auto">
+              <p className="text-2xl font-bold text-white mb-2">3.7 Million SMEs</p>
+              <p className="text-white/80">Ready to innovate with student talent</p>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Benefits Section */}
       <section className="py-20">
