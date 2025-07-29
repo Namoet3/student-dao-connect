@@ -96,33 +96,42 @@ export type Database = {
           budget_min: number | null
           created_at: string | null
           description: string
+          expertise_level: string | null
           id: string
+          mandatory_skills: string[] | null
           owner_id: string | null
           people_count: number | null
           status: string | null
           title: string
+          topic: string | null
         }
         Insert: {
           budget_max?: number | null
           budget_min?: number | null
           created_at?: string | null
           description: string
+          expertise_level?: string | null
           id?: string
+          mandatory_skills?: string[] | null
           owner_id?: string | null
           people_count?: number | null
           status?: string | null
           title: string
+          topic?: string | null
         }
         Update: {
           budget_max?: number | null
           budget_min?: number | null
           created_at?: string | null
           description?: string
+          expertise_level?: string | null
           id?: string
+          mandatory_skills?: string[] | null
           owner_id?: string | null
           people_count?: number | null
           status?: string | null
           title?: string
+          topic?: string | null
         }
         Relationships: []
       }
