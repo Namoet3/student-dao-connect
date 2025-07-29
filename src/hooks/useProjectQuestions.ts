@@ -33,13 +33,13 @@ export const useAskQuestion = () => {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async ({ projectId, question }: { projectId: string; question: string }) => {
+    mutationFn: async ({ projectId, question, userId }: { projectId: string; question: string; userId: string }) => {
       const { data, error } = await supabase
         .from('project_questions')
         .insert({
           project_id: projectId,
           question,
-          applicant_id: 'current_user'
+          applicant_id: userId
         })
         .select()
         .single();

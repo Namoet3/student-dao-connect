@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { MessageCircleQuestion, Trash2, Edit3 } from 'lucide-react';
 import { useProjectQuestions, useAskQuestion, useAnswerQuestion, useDeleteQuestion } from '@/hooks/useProjectQuestions';
+import { useAuth } from '@/contexts/AuthContext';
 import { formatDistanceToNow } from 'date-fns';
 
 interface ProjectQuestionsProps {
@@ -15,6 +16,7 @@ interface ProjectQuestionsProps {
 }
 
 const ProjectQuestions: React.FC<ProjectQuestionsProps> = ({ projectId, isOwner, hasApplied }) => {
+  const { user } = useAuth();
   const [question, setQuestion] = useState('');
   const [answer, setAnswer] = useState('');
   const [editingQuestionId, setEditingQuestionId] = useState<string | null>(null);
@@ -26,9 +28,9 @@ const ProjectQuestions: React.FC<ProjectQuestionsProps> = ({ projectId, isOwner,
   const deleteQuestionMutation = useDeleteQuestion();
 
   const handleAskQuestion = async () => {
-    if (!question.trim()) return;
+    if (!question.trim() || !user?.address) return;
     
-    await askQuestionMutation.mutateAsync({ projectId, question });
+    await askQuestionMutation.mutateAsync({ projectId, question, userId: user.address });
     setQuestion('');
     setIsQuestionDialogOpen(false);
   };
