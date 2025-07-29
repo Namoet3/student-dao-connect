@@ -1,4 +1,4 @@
-import Header from "@/components/Header";
+
 import Footer from "@/components/Footer";
 import { GraduationCap, DollarSign, Trophy, Users, TrendingUp, Building } from "lucide-react";
 
