@@ -138,7 +138,10 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      complete_project: {
+        Args: { project_id_param: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

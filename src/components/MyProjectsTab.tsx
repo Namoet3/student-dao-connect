@@ -5,8 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Trash2, Eye } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Trash2, Eye, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { ActiveProjectsTab } from './ActiveProjectsTab';
+import { CompletedProjectsTab } from './CompletedProjectsTab';
 
 export const MyProjectsTab = () => {
   const { user } = useAuth();
@@ -23,7 +26,7 @@ export const MyProjectsTab = () => {
       case 'open':
         return 'bg-green-100 text-green-800';
       case 'active':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-orange-100 text-orange-800';
       case 'completed':
         return 'bg-gray-100 text-gray-800';
       default:
@@ -37,6 +40,8 @@ export const MyProjectsTab = () => {
     if (!min) return `Up to $${max}`;
     return `$${min} - $${max}`;
   };
+
+  const openProjects = projects?.filter(project => project.status === 'open') || [];
 
   if (!user) {
     return (
@@ -80,87 +85,127 @@ export const MyProjectsTab = () => {
     return (
       <Card>
         <CardContent className="text-center py-8">
-          <p className="text-muted-foreground">You haven't posted any projects yet</p>
-          <Button 
-            className="mt-4" 
-            onClick={() => navigate('/post-project')}
-          >
-            Post Your First Project
-          </Button>
+          <div className="flex flex-col items-center gap-4">
+            <Plus className="w-12 h-12 text-muted-foreground" />
+            <div className="text-center">
+              <p className="text-muted-foreground">You haven't posted any projects yet</p>
+              <p className="text-sm text-muted-foreground mt-2">
+                Start building the university of the future
+              </p>
+            </div>
+            <Button 
+              className="mt-2" 
+              onClick={() => navigate('/post-project')}
+            >
+              Post Your First Project
+            </Button>
+          </div>
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-      {projects.map((project) => (
-        <Card key={project.id} className="relative">
-          <CardHeader>
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <CardTitle className="text-lg line-clamp-2">{project.title}</CardTitle>
-                <CardDescription className="flex items-center gap-2">
-                  <Badge className={getStatusColor(project.status)}>
-                    {project.status}
-                  </Badge>
-                  <span className="text-sm">
-                    {new Date(project.created_at).toLocaleDateString()}
-                  </span>
-                </CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-sm text-muted-foreground line-clamp-3">
-              {project.description}
-            </p>
-            <div className="text-sm font-medium">
-              {formatBudget(project.budget_min, project.budget_max)}
-            </div>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => navigate(`/projects/${project.id}`)}
-                className="flex items-center gap-2"
+    <Tabs defaultValue="open" className="w-full">
+      <TabsList className="grid w-full grid-cols-3">
+        <TabsTrigger value="open">Open ({openProjects.length})</TabsTrigger>
+        <TabsTrigger value="active">Active</TabsTrigger>
+        <TabsTrigger value="completed">Completed</TabsTrigger>
+      </TabsList>
+      
+      <TabsContent value="open" className="mt-6">
+        {openProjects.length === 0 ? (
+          <Card>
+            <CardContent className="text-center py-8">
+              <p className="text-muted-foreground">No open projects</p>
+              <Button 
+                className="mt-4" 
+                onClick={() => navigate('/post-project')}
               >
-                <Eye className="w-4 h-4" />
-                View
+                Post a New Project
               </Button>
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    className="flex items-center gap-2"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                    Delete
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Delete Project</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Are you sure you want to delete "{project.title}"? This action cannot be undone.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={() => handleDeleteProject(project.id)}
-                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {openProjects.map((project) => (
+              <Card key={project.id} className="relative">
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <CardTitle className="text-lg line-clamp-2">{project.title}</CardTitle>
+                      <CardDescription className="flex items-center gap-2">
+                        <Badge className={getStatusColor(project.status)}>
+                          {project.status}
+                        </Badge>
+                        <span className="text-sm">
+                          {new Date(project.created_at).toLocaleDateString()}
+                        </span>
+                      </CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="text-sm text-muted-foreground line-clamp-3">
+                    {project.description}
+                  </p>
+                  <div className="text-sm font-medium">
+                    {formatBudget(project.budget_min, project.budget_max)}
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => navigate(`/projects/${project.id}`)}
+                      className="flex items-center gap-2"
                     >
-                      Delete
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </div>
-          </CardContent>
-        </Card>
-      ))}
-    </div>
+                      <Eye className="w-4 h-4" />
+                      View
+                    </Button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          className="flex items-center gap-2"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                          Delete
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Delete Project</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Are you sure you want to delete "{project.title}"? This action cannot be undone.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => handleDeleteProject(project.id)}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                          >
+                            Delete
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </TabsContent>
+      
+      <TabsContent value="active" className="mt-6">
+        <ActiveProjectsTab />
+      </TabsContent>
+      
+      <TabsContent value="completed" className="mt-6">
+        <CompletedProjectsTab />
+      </TabsContent>
+    </Tabs>
   );
 };
