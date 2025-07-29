@@ -8,10 +8,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { MultiInput } from '@/components/ui/multi-input';
 import { projectSchema, ProjectFormData } from '@/schemas/project';
 import { useCreateProject } from '@/hooks/useProjects';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
+import { PROJECT_TOPICS, EXPERTISE_LEVELS, COMMON_SKILLS } from '@/constants/projectOptions';
 
 export const PostProject = () => {
   const navigate = useNavigate();
@@ -23,6 +26,9 @@ export const PostProject = () => {
     defaultValues: {
       title: '',
       description: '',
+      topic: '',
+      expertise_level: '',
+      mandatory_skills: [],
       budget_min: undefined,
       budget_max: undefined,
       people_count: 1,
@@ -55,6 +61,9 @@ export const PostProject = () => {
         owner_id: user.address,
         title: data.title,
         description: data.description,
+        topic: data.topic,
+        expertise_level: data.expertise_level,
+        mandatory_skills: data.mandatory_skills || null,
         budget_min: data.budget_min || null,
         budget_max: data.budget_max || null,
         people_count: data.people_count,
@@ -121,6 +130,77 @@ export const PostProject = () => {
                             placeholder="Describe your project in detail. Include requirements, goals, and what you're looking for in a collaborator..."
                             className="min-h-[200px]"
                             {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="topic"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Project Topic</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select a topic" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {PROJECT_TOPICS.map((topic) => (
+                                <SelectItem key={topic.value} value={topic.value}>
+                                  {topic.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="expertise_level"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Expertise Level</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select expertise level" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {EXPERTISE_LEVELS.map((level) => (
+                                <SelectItem key={level.value} value={level.value}>
+                                  {level.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <FormField
+                    control={form.control}
+                    name="mandatory_skills"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Mandatory Skills (Optional)</FormLabel>
+                        <FormControl>
+                          <MultiInput
+                            value={field.value || []}
+                            onChange={field.onChange}
+                            placeholder="Add mandatory skills (e.g., React, Python, Figma)"
+                            suggestions={COMMON_SKILLS}
                           />
                         </FormControl>
                         <FormMessage />

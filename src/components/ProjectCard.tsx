@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Clock, DollarSign, User } from 'lucide-react';
 import { Project } from '@/types/database';
 import { cn } from '@/lib/utils';
+import { PROJECT_TOPICS, EXPERTISE_LEVELS } from '@/constants/projectOptions';
 
 interface ProjectCardProps {
   project: Project;
@@ -38,6 +39,18 @@ export const ProjectCard = ({ project, onApply }: ProjectCardProps) => {
     }
   };
 
+  const getTopicLabel = (topic: string | null) => {
+    if (!topic) return null;
+    const topicOption = PROJECT_TOPICS.find(t => t.value === topic);
+    return topicOption?.label || topic;
+  };
+
+  const getExpertiseLabel = (level: string | null) => {
+    if (!level) return null;
+    const levelOption = EXPERTISE_LEVELS.find(l => l.value === level);
+    return levelOption?.label || level;
+  };
+
   return (
     <Card className={cn(
       "h-full hover:shadow-lg transition-all duration-200 cursor-pointer",
@@ -53,6 +66,32 @@ export const ProjectCard = ({ project, onApply }: ProjectCardProps) => {
               <User className="h-4 w-4" />
               <span>{formatAddress(project.owner_id)}</span>
             </div>
+            <div className="flex flex-wrap gap-2 mb-2">
+              {getTopicLabel(project.topic) && (
+                <Badge variant="secondary" className="text-xs">
+                  {getTopicLabel(project.topic)}
+                </Badge>
+              )}
+              {getExpertiseLabel(project.expertise_level) && (
+                <Badge variant="outline" className="text-xs">
+                  {getExpertiseLabel(project.expertise_level)}
+                </Badge>
+              )}
+            </div>
+            {project.mandatory_skills && project.mandatory_skills.length > 0 && (
+              <div className="flex flex-wrap gap-1 mb-2">
+                {project.mandatory_skills.slice(0, 3).map((skill) => (
+                  <Badge key={skill} variant="secondary" className="text-xs px-2 py-0.5">
+                    #{skill}
+                  </Badge>
+                ))}
+                {project.mandatory_skills.length > 3 && (
+                  <Badge variant="secondary" className="text-xs px-2 py-0.5">
+                    +{project.mandatory_skills.length - 3} more
+                  </Badge>
+                )}
+              </div>
+            )}
           </div>
           <Badge className={getStatusColor(project.status)}>
             {project.status}

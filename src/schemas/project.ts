@@ -9,6 +9,15 @@ export const projectSchema = z.object({
     .string()
     .min(20, 'Description must be at least 20 characters')
     .max(2000, 'Description must be less than 2000 characters'),
+  topic: z
+    .string()
+    .min(1, 'Topic is required'),
+  expertise_level: z
+    .string()
+    .min(1, 'Expertise level is required'),
+  mandatory_skills: z
+    .array(z.string())
+    .optional(),
   budget_min: z
     .number()
     .min(0, 'Minimum budget must be positive')

@@ -33,6 +33,7 @@ import {
 import { useProject } from '@/hooks/useProjects';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
+import { PROJECT_TOPICS, EXPERTISE_LEVELS } from '@/constants/projectOptions';
 
 export const ProjectDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -90,6 +91,18 @@ export const ProjectDetail = () => {
       default:
         return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-100';
     }
+  };
+
+  const getTopicLabel = (topic: string | null) => {
+    if (!topic) return null;
+    const topicOption = PROJECT_TOPICS.find(t => t.value === topic);
+    return topicOption?.label || topic;
+  };
+
+  const getExpertiseLabel = (level: string | null) => {
+    if (!level) return null;
+    const levelOption = EXPERTISE_LEVELS.find(l => l.value === level);
+    return levelOption?.label || level;
   };
 
   const shortTitle = project?.title ? 
@@ -226,6 +239,34 @@ export const ProjectDetail = () => {
                           </span>
                         </div>
                       </div>
+                      
+                      {/* Topic and Expertise Level Badges */}
+                      <div className="flex flex-wrap gap-2 mt-4">
+                        {getTopicLabel(project.topic) && (
+                          <Badge variant="secondary" className="text-sm">
+                            {getTopicLabel(project.topic)}
+                          </Badge>
+                        )}
+                        {getExpertiseLabel(project.expertise_level) && (
+                          <Badge variant="outline" className="text-sm">
+                            {getExpertiseLabel(project.expertise_level)}
+                          </Badge>
+                        )}
+                      </div>
+                      
+                      {/* Mandatory Skills */}
+                      {project.mandatory_skills && project.mandatory_skills.length > 0 && (
+                        <div className="mt-4">
+                          <p className="text-sm font-medium mb-2">Required Skills:</p>
+                          <div className="flex flex-wrap gap-2">
+                            {project.mandatory_skills.map((skill) => (
+                              <Badge key={skill} variant="secondary" className="text-sm px-3 py-1">
+                                #{skill}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                     <Badge className={getStatusColor(project.status)} variant="outline">
                       {project.status.charAt(0).toUpperCase() + project.status.slice(1)}

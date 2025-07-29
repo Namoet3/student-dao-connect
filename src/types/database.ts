@@ -3,6 +3,9 @@ export interface Project {
   owner_id: string;
   title: string;
   description: string;
+  topic: string | null;
+  expertise_level: string | null;
+  mandatory_skills: string[] | null;
   budget_min: number | null;
   budget_max: number | null;
   status: 'open' | 'active' | 'completed';
