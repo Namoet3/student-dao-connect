@@ -96,20 +96,12 @@ serve(async (req) => {
           )
         }
 
-        // Get JWT secret from environment
-        const jwtSecret = Deno.env.get('JWT_SECRET')
+        // Get JWT secret from environment or use a default for development
+        let jwtSecret = Deno.env.get('JWT_SECRET')
         if (!jwtSecret) {
-          console.error('JWT_SECRET not configured')
-          return new Response(
-            JSON.stringify({ error: 'Server configuration error' }),
-            { 
-              status: 500,
-              headers: { 
-                ...corsHeaders, 
-                'Content-Type': 'application/json' 
-              } 
-            }
-          )
+          // Use a default secret for development (not recommended for production)
+          jwtSecret = 'university-dao-default-secret-key-change-in-production'
+          console.warn('Using default JWT secret - configure JWT_SECRET environment variable for production')
         }
 
         // Create properly signed JWT
