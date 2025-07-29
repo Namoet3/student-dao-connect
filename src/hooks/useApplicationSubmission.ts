@@ -16,12 +16,31 @@ export const useApplicationSubmission = () => {
       applicantId: string; 
       coverLetter: string; 
     }) => {
+      // Input validation
+      if (!projectId || !applicantId || !coverLetter) {
+        throw new Error('All fields are required');
+      }
+
+      const trimmedCoverLetter = coverLetter.trim();
+      if (trimmedCoverLetter.length < 20) {
+        throw new Error('Cover letter must be at least 20 characters long');
+      }
+
+      if (trimmedCoverLetter.length > 2000) {
+        throw new Error('Cover letter must be less than 2000 characters');
+      }
+
+      // Validate wallet address format
+      if (!/^0x[a-fA-F0-9]{40}$/.test(applicantId)) {
+        throw new Error('Invalid wallet address format');
+      }
+
       const { data, error } = await supabase
         .from('applications')
         .insert([{
           project_id: projectId,
           applicant_id: applicantId,
-          cover_letter: coverLetter.trim(),
+          cover_letter: trimmedCoverLetter,
           status: 'pending'
         }])
         .select()

@@ -8,17 +8,27 @@ export const useAcceptedProjects = (applicantAddress: string | null) => {
     queryFn: async () => {
       if (!applicantAddress) return [];
       
-      // Optimized single query with inner join
+      // Get projects where user has accepted applications
+      const { data: acceptedApplications, error: appError } = await supabase
+        .from('applications')
+        .select('project_id')
+        .eq('applicant_id', applicantAddress)
+        .eq('status', 'accepted');
+
+      if (appError) {
+        throw new Error(appError.message);
+      }
+
+      if (!acceptedApplications || acceptedApplications.length === 0) {
+        return [];
+      }
+
+      const projectIds = acceptedApplications.map(app => app.project_id);
+
       const { data, error } = await supabase
         .from('projects')
-        .select(`
-          *,
-          applications!inner (
-            status
-          )
-        `)
-        .eq('applications.applicant_id', applicantAddress)
-        .eq('applications.status', 'accepted')
+        .select('*')
+        .in('id', projectIds)
         .order('created_at', { ascending: false });
 
       if (error) {

@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { verifyMessage } from "https://esm.sh/ethers@6"
+import { create, verify } from "https://deno.land/x/djwt@v3.0.2/mod.ts"
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -67,17 +68,70 @@ serve(async (req) => {
           )
         }
 
-        // Create a simple JWT payload (in production, use a proper JWT library)
-        const payload = {
-          address: address.toLowerCase(),
-          nonce,
-          exp: Math.floor(Date.now() / 1000) + (60 * 60), // 1 hour expiry
-          iat: Math.floor(Date.now() / 1000)
+        // Input validation for wallet address
+        if (!address || !/^0x[a-fA-F0-9]{40}$/.test(address)) {
+          return new Response(
+            JSON.stringify({ error: 'Invalid wallet address format' }),
+            { 
+              status: 400,
+              headers: { 
+                ...corsHeaders, 
+                'Content-Type': 'application/json' 
+              } 
+            }
+          )
         }
 
-        // For demo purposes, we'll just base64 encode the payload
-        // In production, use proper JWT signing
-        const jwt = btoa(JSON.stringify(payload))
+        // Input validation for nonce
+        if (!nonce || typeof nonce !== 'string' || nonce.length < 10) {
+          return new Response(
+            JSON.stringify({ error: 'Invalid nonce' }),
+            { 
+              status: 400,
+              headers: { 
+                ...corsHeaders, 
+                'Content-Type': 'application/json' 
+              } 
+            }
+          )
+        }
+
+        // Get JWT secret from environment
+        const jwtSecret = Deno.env.get('JWT_SECRET')
+        if (!jwtSecret) {
+          console.error('JWT_SECRET not configured')
+          return new Response(
+            JSON.stringify({ error: 'Server configuration error' }),
+            { 
+              status: 500,
+              headers: { 
+                ...corsHeaders, 
+                'Content-Type': 'application/json' 
+              } 
+            }
+          )
+        }
+
+        // Create properly signed JWT
+        const payload = {
+          sub: address.toLowerCase(), // Subject (wallet address)
+          aud: 'university-dao', // Audience
+          iss: 'university-dao-auth', // Issuer
+          exp: Math.floor(Date.now() / 1000) + (60 * 60), // 1 hour expiry
+          iat: Math.floor(Date.now() / 1000), // Issued at
+          nonce: nonce,
+          wallet: address.toLowerCase()
+        }
+
+        const key = await crypto.subtle.importKey(
+          'raw',
+          new TextEncoder().encode(jwtSecret),
+          { name: 'HMAC', hash: 'SHA-256' },
+          false,
+          ['sign', 'verify']
+        )
+
+        const jwt = await create({ alg: 'HS256', typ: 'JWT' }, payload, key)
 
         // Save wallet connection to database
         const { data: existingConnection, error: fetchError } = await supabase
