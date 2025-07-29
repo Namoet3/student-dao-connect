@@ -52,6 +52,44 @@ export type Database = {
           },
         ]
       }
+      project_questions: {
+        Row: {
+          answer: string | null
+          answered_at: string | null
+          applicant_id: string
+          created_at: string
+          id: string
+          project_id: string
+          question: string
+        }
+        Insert: {
+          answer?: string | null
+          answered_at?: string | null
+          applicant_id: string
+          created_at?: string
+          id?: string
+          project_id: string
+          question: string
+        }
+        Update: {
+          answer?: string | null
+          answered_at?: string | null
+          applicant_id?: string
+          created_at?: string
+          id?: string
+          project_id?: string
+          question?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_project_questions_project_id"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       projects: {
         Row: {
           budget_max: number | null

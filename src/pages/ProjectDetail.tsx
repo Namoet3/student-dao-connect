@@ -20,6 +20,7 @@ import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ApplicationModal } from '@/components/ApplicationModal';
 import { ApplicationsPanel } from '@/components/ApplicationsPanel';
+import ProjectQuestions from '@/components/ProjectQuestions';
 import { supabase } from '@/integrations/supabase/client';
 import {
   Breadcrumb,
@@ -266,6 +267,13 @@ export const ProjectDetail = () => {
                   projectId={project.id}
                 />
               )}
+
+              {/* Q&A Section */}
+              <ProjectQuestions 
+                projectId={project.id} 
+                isOwner={isOwner} 
+                hasApplied={!!userApplication} 
+              />
             </div>
 
             {/* Sidebar */}
