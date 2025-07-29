@@ -73,9 +73,6 @@ const MainHeader = () => {
               <Link to="/roadmap" className={navLinkClass("/roadmap")}>
                 Roadmap
               </Link>
-              <a href="/#how-it-works" className="text-muted-foreground hover:text-primary transition-colors">
-                How It Works
-              </a>
             </nav>
           </div>
 
