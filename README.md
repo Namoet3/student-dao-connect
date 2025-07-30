@@ -1,73 +1,88 @@
-# Welcome to your Lovable project
+# UniversityDAO – Decentralized Student Work & Internship Platform
 
-## Project info
+UniversityDAO is a Web 3.0 marketplace that connects university talent with real-world projects and short-term internships.  
+By automating **escrow**, **payment release**, and **reputation tracking** through smart contracts, the platform brings **trust, transparency, and speed** to both students and employers.
 
-**URL**: https://lovable.dev/projects/5bc7a51e-287f-4980-aa87-ee4e1adb60d4
+---
 
-## How can I edit this code?
+## ✨ Key Value Proposition
+| Problem | Our Solution |
+|---------|--------------|
+| High fees and opaque processes on traditional freelance sites | **DAO-governed escrow** with a < 5 % protocol fee & on-chain auditability |
+| Students struggle to gain verifiable paid experience | **Reputation tokens** + NFT certificates form an immutable portfolio |
+| Companies need flexible, low-overhead help for micro-tasks | Self-service project board, milestone payouts & optional mentor QA |
 
-There are several ways of editing your application.
+---
 
-**Use Lovable**
+## 🏆 Core Features (MVP)
+- **Project Marketplace** – post, browse, and apply for projects/bounties  
+- **Escrow & Delivery Flow** – funds are locked on assignment and released on approval  
+- **Reputation Engine** – on-chain score and badges for every successful delivery  
+- **Wallet Login** – MetaMask (EVM) with optional email magic-link for Web 2.5 users  
+- **DAO Governance** – token holders vote on disputes, fees, and roadmap items  
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/5bc7a51e-287f-4980-aa87-ee4e1adb60d4) and start prompting.
+Planned extensions: real-time chat, AI project matching, multi-currency support, mobile app, and multi-chain deployment.
 
-Changes made via Lovable will be committed automatically to this repo.
+---
 
-**Use your preferred IDE**
+## 🧰 Built With
+- **Vite** – lightning-fast dev server & bundler  
+- **TypeScript** – type-safe development across front-end & scripts  
+- **React** – component-based UI library  
+- **shadcn-ui** – accessible, unstyled component primitives  
+- **Tailwind CSS** – utility-first styling  
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+> **Note:** shadcn-ui components are built on top of Radix UI and styled via Tailwind.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+---
 
-Follow these steps:
+## ⚙️ Tech Stack (Full List)
+```
+| Layer | Technology |
+|-------|------------|
+| Front-end | Vite, React 18, TypeScript, shadcn-ui, Tailwind CSS |
+| State / Data | React Query, Supabase JS |
+| Web 3 | wagmi, ethers.js, MetaMask |
+| Smart Contracts | Solidity 0.8.x, Hardhat |
+| Storage | IPFS / Arweave |
+| Tooling | ESLint, Prettier, Vitest, Husky, Commitlint |
+```
+---
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## 🚀 Getting Started
+```
+npm install
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
 npm run dev
 ```
+---
 
-**Edit a file directly in GitHub**
+## 📂 Repository Structure
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```student-dao-connect/
+├── public/ → Static assets (favicons, images, etc.)
+├── src/ → Main front-end source code
+│ ├── components/ → Reusable UI components (shadcn-ui based)
+│ ├── hooks/ → Custom hooks (e.g., Supabase, Web3)
+│ ├── pages/ → Route-level components (project views, dashboard, etc.)
+│ ├── lib/ → Utility/helper functions
+│ └── contracts/ → Auto-generated contract ABIs
+├── supabase/ → SQL migrations, edge functions, DB config
+└── hardhat/ → Solidity smart contracts and tests
+```
+---
 
-**Use GitHub Codespaces**
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## 📜 License
+Distributed under the MIT License. See LICENSE for more information.
 
-## What technologies are used for this project?
+---
 
-This project is built with:
+## 🙏 Acknowledgements
+Lovable AI – initial scaffolding
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+Supabase – instant Postgres backend & auth
 
-## How can I deploy this project?
+wagmi, ethers, hardhat – open-source Web 3 tooling
 
-Simply open [Lovable](https://lovable.dev/projects/5bc7a51e-287f-4980-aa87-ee4e1adb60d4) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+Early student testers & mentor community
